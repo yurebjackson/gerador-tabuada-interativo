@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>FitTrack Pro</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Segoe UI',sans-serif;background:#F5F5F3;min-height:100vh;color:#1C1C1A}
+:root{
+  --brand:#1D9E75;--brand-d:#0F6E56;--brand-l:#E1F5EE;
+  --acc:#378ADD;--acc-l:#E6F1FB;
+  --color-background-primary:#FFFFFF;
+  --color-background-secondary:#F5F5F3;
+  --color-background-tertiary:#EBEBEA;
+  --color-text-primary:#1C1C1A;
+  --color-text-secondary:#6B6B69;
+  --color-text-tertiary:#A8A8A6;
+  --color-border-primary:#CFCFCD;
+  --color-border-secondary:#E3E3E1;
+  --color-border-tertiary:#EBEBEA;
+  --border-radius-sm:6px;--border-radius-md:8px;--border-radius-lg:12px;
+  --font-sans:'Inter','Segoe UI',sans-serif;
+}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* ===== LOGIN ===== */
+.ls{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:var(--color-background-secondary)}
+.lc{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:2.5rem;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.ll{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.li{width:40px;height:40px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:20px}
+.ll span{font-size:22px;font-weight:600;color:var(--color-text-primary)}
+.rtabs{display:flex;gap:8px;margin-bottom:1.5rem}
+.rtab{flex:1;padding:8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;font-size:13px;font-family:var(--font-sans);text-align:center;transition:all .15s}
+.rtab.on{background:var(--brand);color:white;border-color:var(--brand)}
+.fg{margin-bottom:1rem}
+.fl{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px;display:block;font-weight:500}
+.fi{width:100%;padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;font-family:var(--font-sans);outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--brand)}
+.fsel{width:100%;padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;font-family:var(--font-sans)}
+.fta{width:100%;padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;font-family:var(--font-sans);resize:vertical;min-height:70px;outline:none}
+.fta:focus,.fi:focus{border-color:var(--brand)}
+.bp{width:100%;padding:10px;background:var(--brand);color:white;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-sans);margin-top:.25rem;transition:background .15s}
+.bp:hover:not(:disabled){background:var(--brand-d)}
+.bp:disabled{opacity:.6;cursor:not-allowed}
+.link-btn{background:none;border:none;color:var(--brand);font-size:13px;cursor:pointer;font-family:var(--font-sans);text-decoration:underline}
+
+/* ===== NAV ===== */
+.tn{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;position:sticky;top:0;z-index:100}
+.tl{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--color-text-primary)}
+.tli{width:30px;height:30px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:15px}
+.rb{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+.rp{background:#E6F1FB;color:#185FA5}
+.ral{background:var(--brand-l);color:var(--brand-d)}
+.tr{display:flex;align-items:center;gap:12px}
+.nu{font-size:13px;color:var(--color-text-secondary)}
+.blo{padding:5px 12px;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;color:var(--color-text-secondary);font-family:var(--font-sans)}
+.blo:hover{background:var(--color-background-secondary)}
+
+/* ===== LAYOUT ===== */
+.lay{display:flex;height:calc(100vh - 56px)}
+.sb{width:230px;border-right:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);padding:1rem 0;flex-shrink:0;overflow-y:auto}
+.si{display:flex;align-items:center;gap:10px;padding:9px 1.25rem;cursor:pointer;font-size:13px;color:var(--color-text-secondary);transition:all .1s;border-left:2px solid transparent}
+.si:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.si.on{background:var(--brand-l);color:var(--brand-d);border-left-color:var(--brand);font-weight:600}
+.si i{font-size:17px}
+.ss{font-size:10px;font-weight:700;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.8px;padding:12px 1.25rem 4px}
+.mn{flex:1;overflow-y:auto;padding:1.5rem}
+
+/* ===== ELEMENTS ===== */
+.pt{font-size:20px;font-weight:600;color:var(--color-text-primary);margin-bottom:4px}
+.ps{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem}
+.sc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem}
+.sl{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.sv{font-size:24px;font-weight:600;color:var(--color-text-primary)}
+.cd{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.ct{font-size:15px;font-weight:600;color:var(--color-text-primary)}
+.eg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.ec{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.ec:hover{border-color:var(--brand)}
+.et{height:90px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.ei{padding:10px 12px}
+.en{font-size:13px;font-weight:600;color:var(--color-text-primary);margin-bottom:3px}
+.em{font-size:11px;color:var(--color-text-secondary)}
+.mtag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;background:var(--brand-l);color:var(--brand-d);margin-top:4px;font-weight:500}
+.ytag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;background:#FAECE7;color:#993C1D;margin-top:4px;margin-left:4px;font-weight:500}
+
+/* ===== MODAL ===== */
+.mo{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.mo.op{display:flex}
+.mb{background:var(--color-background-primary);border-radius:var(--border-radius-lg);width:100%;max-width:560px;max-height:92vh;overflow-y:auto}
+.mh{padding:1.25rem;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--color-background-primary);z-index:1}
+.mt{font-size:16px;font-weight:600;color:var(--color-text-primary)}
+.bcl{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:20px;padding:2px}
+.yta{width:100%;overflow:hidden}
+.yta iframe{width:100%;height:220px;display:block;border:none}
+.yta .yph{height:220px;background:#111;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.yta .yph i{font-size:48px;color:#FF0000}
+.mbd{padding:1.25rem}
+.ir{display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
+.it{flex:1;min-width:80px}
+.ik{font-size:11px;color:var(--color-text-secondary);margin-bottom:2px}
+.iv{font-size:14px;font-weight:600;color:var(--color-text-primary)}
+.dt{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.pd{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.pd:hover,.pd.sel{border-color:var(--brand);background:var(--brand-l)}
+.pdn{font-size:14px;font-weight:600;color:var(--color-text-primary)}
+.pdd{font-size:12px;color:var(--color-text-secondary)}
+
+/* ===== STUDENTS LIST ===== */
+.sr2{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.sr2:last-child{border-bottom:none}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.t1{background:#9FE1CB;color:#085041}.t2{background:#B5D4F4;color:#0C447C}
+.t3{background:#FAC775;color:#633806}.t4{background:#F4C0D1;color:#72243E}.t5{background:#CECBF6;color:#3C3489}
+.si2{flex:1}
+.sn{font-size:14px;font-weight:600;color:var(--color-text-primary)}
+.sp{font-size:12px;color:var(--color-text-secondary)}
+.pb{height:5px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;margin-top:5px}
+.pf{height:100%;background:var(--brand);border-radius:3px;transition:width .3s}
+
+/* ===== BUTTONS ===== */
+.bas{font-size:12px;padding:5px 12px;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-secondary);font-family:var(--font-sans);transition:all .15s}
+.bas:hover{background:var(--brand-l);color:var(--brand-d);border-color:var(--brand)}
+.bas:disabled{opacity:.5;cursor:not-allowed}
+.bco{padding:9px 18px;background:var(--brand);color:white;border:none;border-radius:var(--border-radius-md);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-sans);transition:background .15s;display:inline-flex;align-items:center;gap:6px}
+.bco:hover:not(:disabled){background:var(--brand-d)}
+.bco:disabled{opacity:.6;cursor:not-allowed}
+.bcn{padding:9px 16px;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;color:var(--color-text-secondary);font-family:var(--font-sans)}
+.bda{padding:5px 10px;background:transparent;border:0.5px solid #F09595;border-radius:var(--border-radius-md);font-size:11px;cursor:pointer;color:#A32D2D;font-family:var(--font-sans)}
+.bda:hover{background:#FCEBEB}
+.bw{font-size:11px;padding:4px 10px;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--brand);font-family:var(--font-sans);display:inline-flex;align-items:center;gap:4px}
+.bw:hover{background:var(--brand-l)}
+
+/* ===== FILTERS ===== */
+.fr{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.fb{padding:5px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:transparent;font-size:12px;cursor:pointer;color:var(--color-text-secondary);font-family:var(--font-sans);transition:all .15s}
+.fb.on{background:var(--brand);color:white;border-color:var(--brand)}
+
+/* ===== PLAN DAYS ===== */
+.pday{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:12px;overflow:hidden}
+.pdh{padding:12px 1.25rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.pdt{font-size:14px;font-weight:600;color:var(--color-text-primary);display:flex;align-items:center;gap:8px}
+.dba{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--acc-l);color:#185FA5;font-weight:600}
+.pdb{padding:0 1.25rem 1rem;border-top:0.5px solid var(--color-border-tertiary);display:none}
+.pdb.op{display:block}
+.per{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.per:last-child{border-bottom:none}
+.pxi{width:34px;height:34px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--color-background-secondary);flex-shrink:0}
+.pxif{flex:1}
+.pxn{font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.pxs{font-size:12px;color:var(--color-text-secondary)}
+.dc{width:20px;height:20px;border:1.5px solid var(--color-border-secondary);border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s}
+.dc.dn{background:var(--brand);border-color:var(--brand);color:white}
+
+/* ===== HISTORY ===== */
+.hrow{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);align-items:flex-start}
+.hrow:last-child{border-bottom:none}
+.hdate{font-size:11px;color:var(--color-text-secondary);min-width:72px;padding-top:2px}
+.hinfo{flex:1}
+.htitle{font-size:13px;font-weight:600;color:var(--color-text-primary)}
+.hdet{font-size:12px;color:var(--color-text-secondary)}
+.htag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;margin-right:4px;margin-top:3px;background:var(--brand-l);color:var(--brand-d)}
+
+/* ===== ASSESSMENTS ===== */
+.avcat{font-size:13px;padding:3px 10px;border-radius:20px;font-weight:600;display:inline-block}
+.av-ex{background:#EAF3DE;color:#27500A}
+.av-re{background:#FAEEDA;color:#633806}
+.av-fr{background:#FCEBEB;color:#A32D2D}
+
+/* ===== MISC ===== */
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.prof-card{background:var(--acc-l);border:0.5px solid #B5D4F4;border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px}
+.prof-card i{font-size:20px;color:#185FA5}
+.prof-card span{font-size:13px;color:#185FA5;font-weight:600}
+.toast{position:fixed;bottom:24px;right:24px;background:#2C2C2A;color:white;padding:10px 18px;border-radius:var(--border-radius-md);font-size:13px;opacity:0;transition:opacity .3s;z-index:400;display:flex;align-items:center;gap:8px;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.toast.sh{opacity:1}
+.toast.t-erro{background:#A32D2D}
+.toast.t-aviso{background:#7A5200}
+.toast.t-sucesso{background:var(--brand-d)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;z-index:300;font-size:14px;color:var(--color-text-secondary);gap:10px}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ===== BOTTOM NAV (mobile) ===== */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);z-index:150;padding:0 4px;padding-bottom:env(safe-area-inset-bottom)}
+.bnav-inner{display:flex;align-items:stretch;justify-content:space-around}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;font-size:10px;color:var(--color-text-tertiary);cursor:pointer;gap:3px;border:none;background:none;font-family:var(--font-sans);min-height:56px;transition:color .15s}
+.bni i{font-size:22px}
+.bni.on{color:var(--brand)}
+.bni span{font-weight:500}
+
+/* ===== HAMBURGER (mobile topbar) ===== */
+.ham{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--color-text-primary);font-size:22px}
+
+/* ===== SIDEBAR OVERLAY (mobile) ===== */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:119}
+.sb-overlay.op{display:block}
+
+/* ===== MOBILE SIDEBAR ===== */
+@media(max-width:768px){
+  /* Topbar */
+  .tn{padding:0 1rem}
+  .nu{display:none}
+  .ham{display:flex}
+
+  /* Sidebar — drawer lateral */
+  .sb{position:fixed;top:56px;left:0;bottom:0;z-index:120;transform:translateX(-100%);transition:transform .25s;width:260px;box-shadow:4px 0 20px rgba(0,0,0,.12)}
+  .sb.open{transform:translateX(0)}
+
+  /* Layout */
+  .lay{flex-direction:column;height:auto;min-height:calc(100vh - 56px)}
+  .mn{padding:1rem;padding-bottom:80px} /* espaço para bottom nav */
+
+  /* Bottom nav visível */
+  .bnav{display:block}
+
+  /* Grids */
+  .sg{grid-template-columns:repeat(2,1fr)}
+  .fg2{grid-template-columns:1fr}
+  .eg{grid-template-columns:repeat(2,1fr);gap:10px}
+
+  /* Cards de exercício menores */
+  .et{height:70px}
+
+  /* Student rows — empilha botões */
+  .sr2{flex-wrap:wrap;gap:8px;padding:12px 0}
+  .sr2 > div:last-child{width:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .sr2 > div:last-child button{flex:1;min-width:120px;text-align:center;justify-content:center}
+
+  /* Modal full-screen no mobile */
+  .mo{padding:0;align-items:flex-end}
+  .mb{max-width:100%!important;border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;max-height:92vh}
+
+  /* Toast na parte de cima no mobile */
+  .toast{bottom:auto;top:70px;right:12px;left:12px;max-width:100%}
+
+  /* Títulos menores */
+  .pt{font-size:17px}
+
+  /* Histórico */
+  .hdate{min-width:56px;font-size:10px}
+
+  /* Avaliação — grid 2x2 no mobile */
+  .av-grid-4{grid-template-columns:repeat(2,1fr)!important}
+
+  /* Planos */
+  .ch{flex-wrap:wrap;gap:8px}
+
+  /* Esconde texto longo no topbar */
+  .tl > span:first-of-type{display:none}
+}
+
+@media(max-width:400px){
+  .eg{grid-template-columns:1fr}
+  .sg{grid-template-columns:1fr 1fr}
+  .mn{padding:.75rem;padding-bottom:80px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div class="ls" id="LS">
+  <div class="lc">
+    <div class="ll">
+      <div class="li"><i class="ti ti-barbell" aria-hidden="true"></i></div>
+      <span>FitTrack Pro</span>
+    </div>
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1.5rem">Plataforma completa de treinos personalizados</p>
+
+    <div class="rtabs">
+      <div class="rtab on" id="rtA" onclick="selRole('professor')"><i class="ti ti-school"></i> Professor</div>
+      <div class="rtab"    id="rtB" onclick="selRole('aluno')"><i class="ti ti-user"></i> Aluno</div>
+    </div>
+
+    <!-- Formulário de login -->
+    <div id="loginForm">
+      <div class="fg">
+        <label class="fl">E-mail</label>
+        <input class="fi" id="lEmail" type="email" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Senha</label>
+        <input class="fi" id="lPass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="bp" id="btnLogin" data-label="Entrar" onclick="doLogin()">Entrar</button>
+      <p style="text-align:center;margin-top:1rem;font-size:13px;color:var(--color-text-secondary)">
+        Não tem conta? <button class="link-btn" onclick="toggleRegisterForm(true)">Cadastre-se</button>
+      </p>
+    </div>
+
+    <!-- Formulário de cadastro -->
+    <div id="registerForm" style="display:none">
+      <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="regName" placeholder="Seu nome"/></div>
+      <div class="fg"><label class="fl">E-mail</label><input class="fi" id="regEmail" type="email" placeholder="seu@email.com"/></div>
+      <div class="fg"><label class="fl">Senha (mín. 6 caracteres)</label><input class="fi" id="regPass" type="password" placeholder="••••••"/></div>
+      <button class="bp" id="btnRegister" data-label="Criar conta" onclick="doRegister()">Criar conta</button>
+      <p style="text-align:center;margin-top:1rem;font-size:13px;color:var(--color-text-secondary)">
+        Já tem conta? <button class="link-btn" onclick="toggleRegisterForm(false)">Entrar</button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="MA" style="display:none;flex-direction:column;min-height:100vh">
+  <nav class="tn">
+    <div class="tl">
+      <button class="ham" onclick="toggleSidebar()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
+      <div class="tli"><i class="ti ti-barbell" aria-hidden="true"></i></div>
+      FitTrack Pro
+      <span class="rb" id="NB"></span>
+    </div>
+    <div class="tr">
+      <span class="nu" id="NU"></span>
+      <button class="blo" onclick="doLogout()">Sair</button>
+    </div>
+  </nav>
+  <div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+  <div class="lay">
+    <aside class="sb" id="SB"></aside>
+    <main class="mn" id="MC"></main>
+  </div>
+  <!-- Bottom nav mobile — preenchido dinamicamente pelo buildSidebar() -->
+  <nav class="bnav" id="BN" aria-label="Navegação mobile">
+    <div class="bnav-inner" id="BNinner"></div>
+  </nav>
+</div>
+
+<!-- ===== MODAL: VÍDEO ===== -->
+<div class="mo" id="moVideo" onclick="handleVideoOverlayClick(event)">
+  <div class="mb" style="position:relative">
+
+    <!-- Botão fechar fixo no canto superior direito do card -->
+    <button onclick="closeM('moVideo')" style="
+      position:absolute;top:10px;right:10px;z-index:10;
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(0,0,0,.55);border:none;cursor:pointer;
+      color:white;font-size:16px;display:flex;align-items:center;
+      justify-content:center;backdrop-filter:blur(4px);
+    " title="Fechar"><i class="ti ti-x"></i></button>
+
+    <!-- Nome do exercício -->
+    <div style="padding:1rem 1.25rem 0.75rem;padding-right:3rem">
+      <span class="mt" id="mvName">Exercício</span>
+    </div>
+
+    <div class="yta" id="ytArea"></div>
+
+    <div class="mbd">
+      <div class="ir">
+        <div class="it"><div class="ik">Séries</div><div class="iv" id="mvSeries">-</div></div>
+        <div class="it"><div class="ik">Reps</div><div class="iv" id="mvReps">-</div></div>
+        <div class="it"><div class="ik">Descanso</div><div class="iv" id="mvRest">-</div></div>
+        <div class="it"><div class="ik">Grupo</div><div class="iv" id="mvMuscle">-</div></div>
+      </div>
+      <p class="dt" id="mvDesc">-</p>
+
+      <!-- Botão fechar na base também -->
+      <button onclick="closeM('moVideo')" style="
+        width:100%;margin-top:1rem;padding:9px;
+        background:var(--color-background-secondary);
+        border:0.5px solid var(--color-border-secondary);
+        border-radius:var(--border-radius-md);
+        font-size:13px;cursor:pointer;color:var(--color-text-secondary);
+        font-family:var(--font-sans);display:flex;align-items:center;
+        justify-content:center;gap:6px;
+      "><i class="ti ti-x"></i> Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: ATRIBUIR TREINO ===== -->
+<div class="mo" id="moAssign">
+  <div class="mb" style="max-width:480px">
+    <div class="mh">
+      <span class="mt" id="asTitle">Atribuir treino</span>
+      <button class="bcl" onclick="closeM('moAssign')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem">Escolha um plano:</p>
+      <div id="plOpts"></div>
+      <div style="display:flex;gap:8px;margin-top:1rem;justify-content:flex-end">
+        <button class="bcn" onclick="closeM('moAssign')">Cancelar</button>
+        <button class="bco" onclick="confirmAssign()">Atribuir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: NOVO / EDITAR EXERCÍCIO ===== -->
+<div class="mo" id="moNewEx">
+  <div class="mb" style="max-width:520px">
+    <div class="mh">
+      <span class="mt" id="newExTitle">Novo exercício</span>
+      <button class="bcl" onclick="closeM('moNewEx')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <div class="fg2">
+        <div class="fg"><label class="fl">Nome do exercício</label><input class="fi" id="neName" placeholder="Ex: Supino Reto"/></div>
+        <div class="fg"><label class="fl">Grupo muscular</label>
+          <select class="fsel" id="neMuscle">
+            <option>Peito</option><option>Costas</option><option>Pernas</option><option>Ombros</option>
+            <option>Bíceps</option><option>Tríceps</option><option>Core</option><option>Glúteos</option><option>Cardio</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Séries</label><input class="fi" id="neSeries" type="number" placeholder="Ex: 4"/></div>
+        <div class="fg"><label class="fl">Repetições</label><input class="fi" id="neReps" placeholder="Ex: 12-15"/></div>
+        <div class="fg"><label class="fl">Descanso</label><input class="fi" id="neRest" placeholder="Ex: 60s"/></div>
+        <div class="fg"><label class="fl">Dificuldade</label>
+          <select class="fsel" id="neDiff"><option>Iniciante</option><option>Intermediário</option><option>Avançado</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Link do YouTube (opcional)</label><input class="fi" id="neYT" placeholder="https://www.youtube.com/watch?v=..."/></div>
+      <div class="fg"><label class="fl">Instrução de execução</label><textarea class="fta" id="neDesc" placeholder="Descreva como executar o exercício corretamente..."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+        <button class="bcn" onclick="closeM('moNewEx')">Cancelar</button>
+        <button class="bco" id="btnSaveEx" data-label="Salvar exercício" onclick="saveExercise()">Salvar exercício</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: CADASTRAR ALUNO ===== -->
+<div class="mo" id="moNewStudent">
+  <div class="mb" style="max-width:480px">
+    <div class="mh">
+      <span class="mt">Cadastrar aluno</span>
+      <button class="bcl" onclick="closeM('moNewStudent')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <div class="fg2">
+        <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="nsName" placeholder="Nome do aluno"/></div>
+        <div class="fg"><label class="fl">E-mail (login)</label><input class="fi" id="nsEmail" type="email" placeholder="aluno@email.com"/></div>
+        <div class="fg"><label class="fl">Senha</label><input class="fi" type="password" id="nsPass" placeholder="Mín. 6 caracteres"/></div>
+        <div class="fg"><label class="fl">Objetivo</label>
+          <select class="fsel" id="nsGoal">
+            <option>Hipertrofia</option><option>Emagrecimento</option><option>Condicionamento</option>
+            <option>Reabilitação</option><option>Iniciante</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Idade</label><input class="fi" id="nsAge" type="number" placeholder="Ex: 28"/></div>
+        <div class="fg"><label class="fl">Telefone</label><input class="fi" id="nsPhone" placeholder="(00) 00000-0000"/></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+        <button class="bcn" onclick="closeM('moNewStudent')">Cancelar</button>
+        <button class="bco" id="btnSaveStudent" data-label="Cadastrar aluno" onclick="saveStudent()">Cadastrar aluno</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: AVALIAÇÃO FÍSICA ===== -->
+<div class="mo" id="moAvaliacao">
+  <div class="mb" style="max-width:500px">
+    <div class="mh">
+      <span class="mt" id="avTitle">Nova avaliação física</span>
+      <button class="bcl" onclick="closeM('moAvaliacao')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <div class="fg2">
+        <div class="fg"><label class="fl">Peso (kg)</label><input class="fi" id="avPeso" type="number" step="0.1" placeholder="Ex: 75.5"/></div>
+        <div class="fg"><label class="fl">Altura (cm)</label><input class="fi" id="avAltura" type="number" placeholder="Ex: 175"/></div>
+        <div class="fg"><label class="fl">% Gordura corporal</label><input class="fi" id="avGordura" type="number" step="0.1" placeholder="Ex: 18"/></div>
+        <div class="fg"><label class="fl">Massa muscular (kg)</label><input class="fi" id="avMusculo" type="number" step="0.1" placeholder="Ex: 35"/></div>
+        <div class="fg"><label class="fl">Circunf. peitoral (cm)</label><input class="fi" id="avPeito" type="number" placeholder="Ex: 95"/></div>
+        <div class="fg"><label class="fl">Circunf. cintura (cm)</label><input class="fi" id="avCintura" type="number" placeholder="Ex: 82"/></div>
+        <div class="fg"><label class="fl">Circunf. quadril (cm)</label><input class="fi" id="avQuadril" type="number" placeholder="Ex: 98"/></div>
+        <div class="fg"><label class="fl">Circunf. braço (cm)</label><input class="fi" id="avBraco" type="number" placeholder="Ex: 35"/></div>
+      </div>
+      <div class="fg"><label class="fl">Observações</label><textarea class="fta" id="avObs" placeholder="Anotações do professor..."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+        <button class="bcn" onclick="closeM('moAvaliacao')">Cancelar</button>
+        <button class="bco" onclick="saveAvaliacao()">Salvar avaliação</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: ALTERAR SENHA DO ALUNO ===== -->
+<div class="mo" id="moChangePass">
+  <div class="mb" style="max-width:380px">
+    <div class="mh">
+      <span class="mt" id="moChangePassTitle">Alterar senha</span>
+      <button class="bcl" onclick="closeM('moChangePass')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <input type="hidden" id="cpStudentId"/>
+      <div class="fg" style="margin-bottom:1rem">
+        <label class="fl">Nova senha</label>
+        <input class="fi" type="password" id="cpNewPass" placeholder="Mínimo 6 caracteres"/>
+      </div>
+      <div class="fg" style="margin-bottom:1.25rem">
+        <label class="fl">Confirmar senha</label>
+        <input class="fi" type="password" id="cpConfirm" placeholder="Repita a nova senha"/>
+      </div>
+      <div style="background:#FFF8E6;border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:#7A5C00">
+        <i class="ti ti-alert-circle"></i> O aluno precisará usar a nova senha no próximo login.
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="bcn" onclick="closeM('moChangePass')">Cancelar</button>
+        <button class="bco" id="btnDoChangePass" data-label="Alterar senha" onclick="doChangePass()">
+          <i class="ti ti-key"></i> Alterar senha
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mo" id="moProfPerfil">
+  <div class="mb" style="max-width:460px">
+    <div class="mh">
+      <span class="mt">Editar perfil de professor</span>
+      <button class="bcl" onclick="closeM('moProfPerfil')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <!-- E-mail somente leitura -->
+      <div class="fg" style="margin-bottom:1rem">
+        <label class="fl">E-mail (não editável)</label>
+        <div style="padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);font-size:13px;color:var(--color-text-secondary)" id="ppEmailDisplay">—</div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="ppName" placeholder="Seu nome"/></div>
+        <div class="fg"><label class="fl">Especialidade</label>
+          <select class="fsel" id="ppEsp">
+            <option>Musculação</option><option>Funcional</option><option>CrossFit</option>
+            <option>Pilates</option><option>Fisioterapia</option><option>Nutrição esportiva</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">CREF</label><input class="fi" id="ppCref" placeholder="Ex: 123456-G/PI"/></div>
+        <div class="fg"><label class="fl">Telefone</label><input class="fi" id="ppTel" placeholder="(00) 00000-0000"/></div>
+      </div>
+      <div class="fg"><label class="fl">Bio / apresentação</label><textarea class="fta" id="ppBio" placeholder="Conte um pouco sobre você e sua metodologia..."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+        <button class="bcn" onclick="closeM('moProfPerfil')">Cancelar</button>
+        <button class="bco" id="btnSaveProf" data-label="Salvar perfil" onclick="saveProfPerfil()"><i class="ti ti-check"></i> Salvar perfil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: CRIAR PLANO ===== -->
+<div class="mo" id="moNewPlan">
+  <div class="mb" style="max-width:560px">
+    <div class="mh">
+      <span class="mt">Criar plano de treino</span>
+      <button class="bcl" onclick="closeM('moNewPlan')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <div class="fg2">
+        <div class="fg"><label class="fl">Aluno</label>
+          <select class="fsel" id="plStudentSel">
+            <option value="">Selecione um aluno</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Nome do plano</label><input class="fi" id="plName" placeholder="Ex: Hipertrofia A/B"/></div>
+      </div>
+      <div class="fg"><label class="fl">Descrição</label><input class="fi" id="plDesc" placeholder="Ex: 4 dias/sem · Ganho de massa"/></div>
+      <div id="planDaysContainer"></div>
+      <button class="bas" style="margin-bottom:1rem" onclick="addPlanDay()"><i class="ti ti-plus"></i> Adicionar dia</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="bcn" onclick="closeM('moNewPlan')">Cancelar</button>
+        <button class="bco" id="btnSavePlan" data-label="Criar plano" onclick="savePlan()">Criar plano</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i id="toastIcon" class="ti ti-check" aria-hidden="true"></i><span id="toastMsg">Ok!</span></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="auth.js"></script>
+<script src="students.js"></script>
+<script src="exercises.js"></script>
+<script src="plans.js"></script>
+<script>
+// ============================================================
+// Estado global da UI
+// ============================================================
+let curRole      = 'professor';
+let curUser      = null;
+let selPlan      = null;
+let assignTarget = null;
+let avTarget     = null;
+let editExId     = null;
+let trainStartTime = null;
+let trainTimer     = null;
+let trainDayIndex  = null;
+let completedEx  = {};
+let openDays     = {};
+let activeFilter = 'Todos';
+let planDayCount = 0;
+
+// ============================================================
+// Helpers
+// ============================================================
+
+function muscleColor(muscle) {
+  const map = {
+    'Peito':    '#E1F5EE', 'Costas':   '#E6F1FB', 'Pernas':   '#FAEEDA',
+    'Ombros':   '#FBEAF0', 'Bíceps':   '#EAF3DE', 'Tríceps':  '#EEEDFE',
+    'Core':     '#FAECE7', 'Glúteos':  '#FDE9F4', 'Cardio':   '#E8F4FD',
+  };
+  return map[muscle] ?? '#EBEBEA';
+}
+
+function muscleColorDark(muscle) {
+  const map = {
+    'Peito':    '#0F6E56', 'Costas':   '#185FA5', 'Pernas':   '#633806',
+    'Ombros':   '#72243E', 'Bíceps':   '#27500A', 'Tríceps':  '#3C3489',
+    'Core':     '#993C1D', 'Glúteos':  '#8B1A5E', 'Cardio':   '#0C5A8A',
+  };
+  return map[muscle] ?? '#6B6B69';
+}
+
+const avCls = i => ['t1','t2','t3','t4','t5'][i % 5];
+const initials = n => n.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+const fmtDate = d => {
+  if (!d) return '';
+  const [y, m, dd] = d.slice(0, 10).split('-');
+  return `${dd} ${['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][parseInt(m)-1]} ${y}`;
+};
+
+function openM(id)  { document.getElementById(id).classList.add('op') }
+function closeM(id) {
+  document.getElementById(id).classList.remove('op');
+  // Para o vídeo do YouTube ao fechar o modal
+  if (id === 'moVideo') {
+    const yta = document.getElementById('ytArea');
+    const iframe = yta?.querySelector('iframe');
+    if (iframe) iframe.src = iframe.src; // recarrega e para o vídeo
+  }
+}
+// Fecha modal de vídeo ao clicar no overlay escuro
+function handleVideoOverlayClick(e) {
+  if (e.target === document.getElementById('moVideo')) closeM('moVideo');
+}
+
+let _toastTimer = null;
+function showToast(msg, tipo = 'sucesso', duracao = 3500) {
+  const t    = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  const span = document.getElementById('toastMsg');
+
+  // Ícone por tipo
+  const icones = { sucesso: 'ti-check', erro: 'ti-alert-circle', aviso: 'ti-clock' };
+  icon.className = 'ti ' + (icones[tipo] || 'ti-check');
+
+  // Cor por tipo
+  t.classList.remove('t-erro','t-aviso','t-sucesso');
+  if (tipo !== 'sucesso') t.classList.add('t-' + tipo);
+
+  span.textContent = msg;
+  t.classList.add('sh');
+
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('sh'), duracao);
+}
+
+function setBtnLoading(id, loading) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled    = loading;
+  btn.textContent = loading ? 'Aguarde...' : btn.dataset.label;
+}
+
+function selRole(r) {
+  curRole = r;
+  document.getElementById('rtA').classList.toggle('on', r === 'professor');
+  document.getElementById('rtB').classList.toggle('on', r === 'aluno');
+}
+
+// ============================================================
+// Carregamento de dados
+// ============================================================
+async function loadAllData() {
+  await Promise.all([loadStudents(), loadExercises(), loadPlans()]);
+}
+
+// ============================================================
+// Sidebar
+// ============================================================
+function buildSidebar() {
+  const s = document.getElementById('SB');
+
+  if (curUser.role === 'professor') {
+    s.innerHTML = `
+      <div class="ss">Painel do professor</div>
+      <div class="si" data-p="dashboard"       onclick="nav('dashboard')"><i class="ti ti-layout-dashboard"></i>Visão Geral</div>
+      <div class="si" data-p="meu-perfil"      onclick="nav('meu-perfil')"><i class="ti ti-school"></i>Meu perfil</div>
+      <div class="ss">Meus alunos</div>
+      <div class="si" data-p="alunos"          onclick="nav('alunos')"><i class="ti ti-users"></i>Gerenciar alunos</div>
+      <div class="si" data-p="avaliacoes"      onclick="nav('avaliacoes')"><i class="ti ti-heart-rate-monitor"></i>Avaliações físicas</div>
+      <div class="si" data-p="historico-prof"  onclick="nav('historico-prof')"><i class="ti ti-history"></i>Histórico geral</div>
+      <div class="ss">Conteúdo</div>
+      <div class="si" data-p="exercicios"      onclick="nav('exercicios')"><i class="ti ti-barbell"></i>Exercícios</div>
+      <div class="si" data-p="planos"          onclick="nav('planos')"><i class="ti ti-clipboard-list"></i>Planos de treino</div>`;
+
+    // Bottom nav mobile — 5 itens principais do professor
+    _buildBottomNav([
+      { p:'dashboard',      icon:'ti-layout-dashboard',   label:'Início' },
+      { p:'alunos',         icon:'ti-users',              label:'Alunos' },
+      { p:'exercicios',     icon:'ti-barbell',            label:'Exercícios' },
+      { p:'historico-prof', icon:'ti-history',            label:'Histórico' },
+      { p:'meu-perfil',     icon:'ti-school',             label:'Perfil' },
+    ]);
+  } else {
+    s.innerHTML = `
+      <div class="ss">Minha área</div>
+      <div class="si" data-p="meu-treino"        onclick="nav('meu-treino')"><i class="ti ti-clipboard-check"></i>Meu Treino</div>
+      <div class="si" data-p="exercicios"        onclick="nav('exercicios')"><i class="ti ti-barbell"></i>Exercícios</div>
+      <div class="ss">Evolução</div>
+      <div class="si" data-p="minha-avaliacao"   onclick="nav('minha-avaliacao')"><i class="ti ti-heart-rate-monitor"></i>Minhas avaliações</div>
+      <div class="si" data-p="meu-historico"     onclick="nav('meu-historico')"><i class="ti ti-history"></i>Meu histórico</div>
+      <div class="si" data-p="progresso"         onclick="nav('progresso')"><i class="ti ti-chart-line"></i>Progresso</div>`;
+
+    // Bottom nav mobile — aluno
+    _buildBottomNav([
+      { p:'meu-treino',      icon:'ti-clipboard-check',   label:'Treino' },
+      { p:'exercicios',      icon:'ti-barbell',           label:'Exercícios' },
+      { p:'minha-avaliacao', icon:'ti-heart-rate-monitor',label:'Avaliação' },
+      { p:'meu-historico',   icon:'ti-history',           label:'Histórico' },
+      { p:'progresso',       icon:'ti-chart-line',        label:'Progresso' },
+    ]);
+  }
+}
+
+function _buildBottomNav(items) {
+  const bn = document.getElementById('BNinner');
+  if (!bn) return;
+  bn.innerHTML = items.map(item => `
+    <button class="bni" data-p="${item.p}" onclick="nav('${item.p}')" aria-label="${item.label}">
+      <i class="ti ${item.icon}"></i>
+      <span>${item.label}</span>
+    </button>`).join('');
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('SB');
+  const ov = document.getElementById('sbOverlay');
+  const open = sb.classList.toggle('open');
+  ov.classList.toggle('op', open);
+}
+
+function closeSidebar() {
+  document.getElementById('SB')?.classList.remove('open');
+  document.getElementById('sbOverlay')?.classList.remove('op');
+}
+
+function nav(page) {
+  closeSidebar();
+  document.querySelectorAll('.si,.bni').forEach(el => el.classList.toggle('on', el.dataset.p === page));
+  document.getElementById('MC').innerHTML = '';
+  const pages = {
+    dashboard: rDashboard, alunos: rAlunos, exercicios: rExercicios,
+    planos: rPlanos, avaliacoes: rAvaliacoes, 'historico-prof': rHistoricoProf,
+    'meu-perfil': rMeuPerfil, 'meu-treino': rMeuTreino,
+    'minha-avaliacao': rMinhaAvaliacao, 'meu-historico': rMeuHistorico, progresso: rProgresso,
+  };
+  pages[page]?.();
+  window.scrollTo(0, 0);
+}
+
+// ============================================================
+// PÁGINAS — PROFESSOR
+// ============================================================
+function rDashboard() {
+  const wp = STUDENTS.filter(s => s.plan_id || s.plan).length;
+  const totalAv = STUDENTS.reduce((a, s) => a + (s.avaliacoes?.length ?? 0), 0);
+  document.getElementById('MC').innerHTML = `
+    <div class="prof-card"><i class="ti ti-school" aria-hidden="true"></i>
+      <span>Área do Professor · ${CURRENT_PROFILE?.name ?? ''} ${CURRENT_PROFILE?.cref ? '· ' + CURRENT_PROFILE.cref : ''}</span>
+    </div>
+    <p class="pt">Visão Geral</p><p class="ps">Bem-vindo de volta, professor!</p>
+    <div class="sg">
+      <div class="sc"><div class="sl">Total de alunos</div><div class="sv">${STUDENTS.length}</div></div>
+      <div class="sc"><div class="sl">Com plano ativo</div><div class="sv">${wp}</div></div>
+      <div class="sc"><div class="sl">Exercícios</div><div class="sv">${EXERCISES.length}</div></div>
+      <div class="sc"><div class="sl">Avaliações</div><div class="sv">${totalAv}</div></div>
+    </div>
+    <div class="cd">
+      <div class="ch"><span class="ct">Seus alunos</span><button class="bas" onclick="nav('alunos')">Ver todos</button></div>
+      ${STUDENTS.length ? STUDENTS.map((s, i) => {
+        const pl = getPlanById(s.plan_id || s.plan);
+        return `<div class="sr2">
+          <div class="av ${avCls(i)}">${initials(s.name)}</div>
+          <div class="si2">
+            <div class="sn">${s.name}</div>
+            <div class="sp">${pl ? pl.name : 'Sem plano'} · ${s.goal ?? ''}</div>
+            ${pl ? `<div class="pb"><div class="pf" style="width:${s.progress ?? 0}%"></div></div>` : ''}
+          </div>
+          <span style="font-size:12px;color:var(--color-text-secondary)">${s.progress ?? 0}%</span>
+        </div>`;
+      }).join('') : `<p style="font-size:13px;color:var(--color-text-secondary)">Nenhum aluno cadastrado.</p>`}
+    </div>`;
+}
+
+function rMeuPerfil() {
+  const p = CURRENT_PROFILE ?? {};
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Meu Perfil</p><p class="ps">Suas informações como professor.</p>
+    <div class="cd">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.5rem">
+        <div class="av t2" style="width:56px;height:56px;font-size:18px">${initials(p.name ?? '?')}</div>
+        <div>
+          <div style="font-size:17px;font-weight:600;color:var(--color-text-primary)">${p.name ?? ''}</div>
+          <div style="font-size:13px;color:var(--color-text-secondary)">${p.specialty ?? 'Professor'}</div>
+          <span class="rb rp" style="margin-top:4px;display:inline-block">Professor</span>
+        </div>
+        <button class="bas" style="margin-left:auto" onclick="openProfPerfil()"><i class="ti ti-edit"></i> Editar</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+        <div class="sc"><div class="sl">CREF</div><div style="font-size:14px;font-weight:600">${p.cref || '—'}</div></div>
+        <div class="sc"><div class="sl">Especialidade</div><div style="font-size:14px;font-weight:600">${p.specialty || '—'}</div></div>
+        <div class="sc"><div class="sl">Telefone</div><div style="font-size:14px;font-weight:600">${p.phone || '—'}</div></div>
+        <div class="sc"><div class="sl">Alunos ativos</div><div style="font-size:14px;font-weight:600">${STUDENTS.length}</div></div>
+      </div>
+      ${p.bio ? `<div style="border-top:0.5px solid var(--color-border-tertiary);padding-top:1rem">
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:4px">Bio</div>
+        <p style="font-size:13px;line-height:1.6">${p.bio}</p></div>` : ''}
+    </div>`;
+}
+
+function openProfPerfil() {
+  const p = CURRENT_PROFILE ?? {};
+  document.getElementById('ppEmailDisplay').textContent = CURRENT_USER?.email ?? '—';
+  document.getElementById('ppName').value = p.name ?? '';
+  document.getElementById('ppEsp').value  = p.specialty ?? 'Musculação';
+  document.getElementById('ppCref').value = p.cref ?? '';
+  document.getElementById('ppTel').value  = p.phone ?? '';
+  document.getElementById('ppBio').value  = p.bio ?? '';
+  openM('moProfPerfil');
+}
+
+function rAlunos() {
+  const ativos   = STUDENTS.filter(s => s.active !== false);
+  const inativos = STUDENTS.filter(s => s.active === false);
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Gerenciar Alunos</p>
+    <p class="ps">Cadastre, atribua treinos e gerencie seus alunos.</p>
+    <div style="margin-bottom:1rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="bco" onclick="openM('moNewStudent')"><i class="ti ti-plus"></i> Cadastrar aluno</button>
+      ${inativos.length ? `<button class="bas" id="btnToggleInativos" onclick="toggleInativos()"
+        style="font-size:12px"><i class="ti ti-eye"></i> Ver inativos (${inativos.length})</button>` : ''}
+    </div>
+    <div class="cd" id="alunosCard">${renderStudentRows(false)}</div>`;
+}
+
+let showInativos = false;
+function toggleInativos() {
+  showInativos = !showInativos;
+  document.getElementById('alunosCard').innerHTML = renderStudentRows(showInativos);
+  const btn = document.getElementById('btnToggleInativos');
+  if (btn) btn.innerHTML = showInativos
+    ? `<i class="ti ti-eye-off"></i> Ocultar inativos`
+    : `<i class="ti ti-eye"></i> Ver inativos (${STUDENTS.filter(s => s.active === false).length})`;
+}
+
+function renderStudentRows(includeInativos = false) {
+  const list = includeInativos
+    ? STUDENTS.filter(s => s.active === false)
+    : STUDENTS.filter(s => s.active !== false);
+
+  if (!list.length) return `<p style="font-size:13px;color:var(--color-text-secondary)">
+    ${includeInativos ? 'Nenhum aluno inativo.' : 'Nenhum aluno ativo cadastrado ainda.'}
+  </p>`;
+
+  return list.map((s, i) => {
+    const pl      = getPlanById(s.plan_id || s.plan);
+    const inativo = s.active === false;
+    return `<div class="sr2" style="${inativo ? 'opacity:.55;' : ''}">
+      <div class="av ${avCls(i)}" style="${inativo ? 'filter:grayscale(1)' : ''}">${initials(s.name)}</div>
+      <div class="si2">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="sn">${s.name}</div>
+          ${inativo ? `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:#F0EFEE;color:#6B6B69;font-weight:600">Inativo</span>` : ''}
+        </div>
+        <div class="sp">${s.goal ?? ''} ${s.age ? '· ' + s.age + ' anos' : ''}</div>
+        <div class="sp">${pl ? `<i class="ti ti-clipboard-check" style="color:var(--brand)"></i> ${pl.name}` : 'Sem plano atribuído'}</div>
+        ${pl && !inativo ? `<div class="pb"><div class="pf" style="width:${s.progress ?? 0}%"></div></div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        ${!inativo ? `
+          <button class="bas" onclick="openAssign('${s.id}')"><i class="ti ti-clipboard-list"></i> ${pl ? 'Alterar' : 'Atribuir'} treino</button>
+          <button class="bas" onclick="openAvFor('${s.id}')"><i class="ti ti-heart-rate-monitor"></i> Avaliar</button>
+          <button class="bas" onclick="openChangePass('${s.id}','${s.name.replace(/'/g,"\\'")}')"><i class="ti ti-key"></i> Alterar senha</button>
+          <button class="bda" onclick="toggleStudentActive('${s.id}', false)"><i class="ti ti-user-off"></i> Desativar</button>
+        ` : `
+          <button class="bco" style="font-size:12px" onclick="toggleStudentActive('${s.id}', true)"><i class="ti ti-user-check"></i> Reativar</button>
+        `}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// Desativar / Reativar aluno
+// ============================================================
+async function toggleStudentActive(id, active) {
+  const acao = active ? 'reativar' : 'desativar';
+  if (!confirm(`Deseja ${acao} este aluno?`)) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from('students')
+      .update({ active })
+      .eq('id', id);
+    if (error) throw error;
+
+    const s = STUDENTS.find(st => st.id === id);
+    if (s) s.active = active;
+
+    showToast(`Aluno ${active ? 'reativado' : 'desativado'} com sucesso.`, 'sucesso');
+    showInativos = !active; // mostra inativos se acabou de desativar
+    rAlunos();
+    if (!active) toggleInativos(); // abre a seção de inativos automaticamente
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'erro');
+  }
+}
+
+// ============================================================
+// Modal alterar senha do aluno
+// ============================================================
+function openChangePass(studentId, studentName) {
+  document.getElementById('moChangePassTitle').textContent = `Alterar senha — ${studentName}`;
+  document.getElementById('cpStudentId').value = studentId;
+  document.getElementById('cpNewPass').value   = '';
+  document.getElementById('cpConfirm').value   = '';
+  openM('moChangePass');
+}
+
+async function doChangePass() {
+  const studentId = document.getElementById('cpStudentId').value;
+  const newPass   = document.getElementById('cpNewPass').value;
+  const confirm   = document.getElementById('cpConfirm').value;
+
+  if (!newPass || newPass.length < 6) {
+    showToast('A senha deve ter ao menos 6 caracteres', 'aviso'); return;
+  }
+  if (newPass !== confirm) {
+    showToast('As senhas não coincidem', 'aviso'); return;
+  }
+
+  const student = STUDENTS.find(s => s.id === studentId);
+  if (!student?.user_id) {
+    showToast('Aluno sem conta de acesso vinculada', 'erro'); return;
+  }
+
+  setBtnLoading('btnDoChangePass', true);
+
+  try {
+    // Pega o token JWT atual do professor
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session?.access_token) throw new Error('Sessão expirada. Faça login novamente.');
+
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/change-student-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        studentUserId: student.user_id,
+        newPassword:   newPass,
+      }),
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Erro desconhecido');
+
+    closeM('moChangePass');
+    showToast(`Senha de ${data.studentName} alterada com sucesso!`, 'sucesso');
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'erro');
+  } finally {
+    setBtnLoading('btnDoChangePass', false);
+  }
+}
+
+function rExercicios() {
+  const muscles = ['Todos', ...new Set(EXERCISES.map(e => e.muscle))];
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Exercícios</p><p class="ps">Biblioteca com vídeos do YouTube.</p>
+    ${curUser.role === 'professor' ? `
+    <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+      <button class="bco" onclick="openNewEx()"><i class="ti ti-plus"></i> Novo exercício</button>
+      <button class="bas" style="display:flex;align-items:center;gap:6px" onclick="openImportLibrary()">
+        <i class="ti ti-database-import"></i> Importar biblioteca
+      </button>
+    </div>` : ''}
+    <div class="fr" id="fRow">${muscles.map(m => `<button class="fb ${m === activeFilter ? 'on' : ''}" onclick="filterEx('${m}')">${m}</button>`).join('')}</div>
+    <div class="eg" id="exGrid">${renderExCards(activeFilter)}</div>`;
+}
+
+// ============================================================
+// BIBLIOTECA DE EXERCÍCIOS — MUSCULAÇÃO TRADICIONAL
+// ============================================================
+const EXERCISE_LIBRARY = [
+  // PEITO
+  { name:'Supino Reto com Barra',       muscle:'Peito',   series:'4', reps:'8–12',  rest:'90s', difficulty:'Intermediário', description:'Deite no banco reto. Segure a barra na largura dos ombros. Desça controlando até o peito e empurre para cima sem travar os cotovelos.' },
+  { name:'Supino Inclinado com Halteres',muscle:'Peito',   series:'3', reps:'10–12', rest:'75s', difficulty:'Intermediário', description:'Banco inclinado a 30–45°. Halteres na altura do peito, cotovelos levemente abaixo dos ombros. Empurre para cima convergindo os braços.' },
+  { name:'Supino Declinado com Barra',   muscle:'Peito',   series:'3', reps:'10–12', rest:'75s', difficulty:'Intermediário', description:'Banco declinado. Barra desce em direção à parte inferior do peitoral. Mantém o arco lombar leve e pés presos.' },
+  { name:'Crucifixo com Halteres',       muscle:'Peito',   series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Deite no banco reto. Halteres abertos em arco amplo, cotovelos levemente flexionados. Sinta o alongamento no peito e feche os braços no topo.' },
+  { name:'Crossover no Cabo',            muscle:'Peito',   series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Cabos na altura alta. Incline levemente o tronco. Puxe os cabos em arco até as mãos se cruzarem na frente do abdômen.' },
+  { name:'Flexão de Braço',              muscle:'Peito',   series:'4', reps:'15–20', rest:'60s', difficulty:'Iniciante',    description:'Mãos na largura dos ombros, corpo reto. Desça o peito próximo ao chão e empurre de volta. Mantenha o core contraído durante todo o movimento.' },
+  { name:'Peck Deck (Fly na Máquina)',   muscle:'Peito',   series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Sente-se com as costas apoiadas. Posicione os cotovelos nos apoios na altura dos ombros. Junte os braços à frente sem trancar o movimento.' },
+
+  // COSTAS
+  { name:'Puxada Frontal na Polia',      muscle:'Costas',  series:'4', reps:'10–12', rest:'75s', difficulty:'Iniciante',    description:'Pegada aberta, um pouco além da largura dos ombros. Puxe a barra até o queixo, contraindo as escápulas. Controle a volta.' },
+  { name:'Remada Curvada com Barra',     muscle:'Costas',  series:'4', reps:'8–12',  rest:'90s', difficulty:'Intermediário', description:'Quadril levemente para trás, tronco inclinado a 45°. Puxe a barra em direção ao abdômen. Contraia as escápulas no topo.' },
+  { name:'Remada Unilateral com Halter', muscle:'Costas',  series:'3', reps:'10–12', rest:'60s', difficulty:'Iniciante',    description:'Apoie um joelho e mão no banco. Puxe o halter em linha reta até o quadril, cotovelo próximo ao corpo. Controle a descida.' },
+  { name:'Barra Fixa (Pull-up)',         muscle:'Costas',  series:'4', reps:'6–10',  rest:'90s', difficulty:'Avançado',     description:'Pegada pronada além dos ombros. Puxe o corpo até o queixo passar a barra. Desça lentamente em 2–3 segundos.' },
+  { name:'Remada na Máquina',            muscle:'Costas',  series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Sente com o peito no apoio. Puxe as alças em direção ao abdômen contraindo as escápulas. Retorne com controle.' },
+  { name:'Pullover com Halter',          muscle:'Costas',  series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Deite transversalmente no banco. Segure um halter acima do peito. Desça o peso atrás da cabeça mantendo cotovelos levemente flexionados.' },
+  { name:'Puxada Fechada (Pegada Supinada)', muscle:'Costas', series:'3', reps:'10–12', rest:'75s', difficulty:'Iniciante', description:'Pegada supinada na largura dos ombros. Puxe a barra até o peito. Foco em contrair o latíssimo do dorso.' },
+
+  // PERNAS
+  { name:'Agachamento Livre com Barra',  muscle:'Pernas',  series:'4', reps:'8–12',  rest:'120s',difficulty:'Intermediário', description:'Barra na altura do trapézio. Pés na largura dos ombros. Desça até as coxas ficarem paralelas ao chão mantendo o joelho alinhado com o pé.' },
+  { name:'Leg Press 45°',               muscle:'Pernas',  series:'4', reps:'10–15', rest:'90s', difficulty:'Iniciante',    description:'Pés na plataforma na largura dos ombros. Desça até 90° no joelho. Empurre sem travar os joelhos no topo. Não retire as costas do banco.' },
+  { name:'Cadeira Extensora',           muscle:'Pernas',  series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Ajuste o apoio na altura do tornozelo. Estenda as pernas até quase travar. Controle a descida em 2 segundos. Foca no quadríceps.' },
+  { name:'Mesa Flexora',                muscle:'Pernas',  series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Deite de bruços. Ajuste o apoio acima do calcanhar. Flexione os joelhos trazendo os calcanhares até o glúteo. Foca nos isquiotibiais.' },
+  { name:'Stiff com Halteres',          muscle:'Pernas',  series:'3', reps:'10–12', rest:'75s', difficulty:'Intermediário', description:'Em pé, halteres à frente das coxas. Incline o tronco mantendo as costas retas. Sinta o alongamento nos isquiotibiais. Retorne contraindo o glúteo.' },
+  { name:'Avanço (Lunge) com Halteres', muscle:'Pernas',  series:'3', reps:'12 cada', rest:'75s', difficulty:'Iniciante', description:'De pé com halteres. Dê um passo à frente e desça até o joelho traseiro quase tocar o chão. Retorne e troque a perna.' },
+  { name:'Panturrilha no Smith',        muscle:'Pernas',  series:'4', reps:'15–20', rest:'60s', difficulty:'Iniciante',    description:'Barra no trapézio, pés na borda de um degrau. Suba nas pontas dos pés no máximo possível. Desça lentamente sentindo o alongamento.' },
+  { name:'Hack Squat na Máquina',       muscle:'Pernas',  series:'3', reps:'10–12', rest:'90s', difficulty:'Intermediário', description:'Costas no apoio, pés na plataforma. Desça até 90°. Empurre sem travar os joelhos. Ótimo para isolar o quadríceps.' },
+  { name:'Cadeira Adutora',            muscle:'Pernas',  series:'3', reps:'15–20', rest:'60s', difficulty:'Iniciante',    description:'Sente com as pernas afastadas na máquina. Junte as pernas contraindo os adutores. Retorne com controle sem bater.' },
+  { name:'Cadeira Abdutora',           muscle:'Pernas',  series:'3', reps:'15–20', rest:'60s', difficulty:'Iniciante',    description:'Sente com as pernas unidas na máquina. Afaste as pernas contraindo os glúteos e abdutores. Retorne com controle.' },
+
+  // OMBROS
+  { name:'Desenvolvimento com Halteres', muscle:'Ombros', series:'4', reps:'10–12', rest:'75s', difficulty:'Intermediário', description:'Sentado ou em pé. Halteres na altura dos ombros. Empurre acima da cabeça sem travar os cotovelos. Desça controlando.' },
+  { name:'Elevação Lateral com Halteres',muscle:'Ombros', series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Em pé, halteres ao lado do corpo. Eleve os braços até a altura dos ombros mantendo um leve arco no cotovelo. Desça lentamente.' },
+  { name:'Elevação Frontal com Halteres',muscle:'Ombros', series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Halteres à frente das coxas. Eleve um braço de cada vez até a altura dos ombros. Mantenha o cotovelo levemente flexionado.' },
+  { name:'Desenvolvimento Arnold',       muscle:'Ombros', series:'3', reps:'10–12', rest:'75s', difficulty:'Intermediário', description:'Inicie com as palmas voltadas para você na altura dos ombros. Ao empurrar para cima, gire os punhos para fora. Retorne girando de volta.' },
+  { name:'Remada Alta com Barra',        muscle:'Ombros', series:'3', reps:'10–12', rest:'75s', difficulty:'Intermediário', description:'Barra à frente das coxas, pegada fechada. Puxe até o queixo elevando os cotovelos. Mantenha a barra próxima ao corpo.' },
+  { name:'Crucifixo Inverso com Halteres',muscle:'Ombros',series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',   description:'Incline o tronco a 45° ou apoie no banco. Eleve os halteres lateralmente para trás contraindo o deltoide posterior.' },
+
+  // BÍCEPS
+  { name:'Rosca Direta com Barra',      muscle:'Bíceps',  series:'4', reps:'10–12', rest:'60s', difficulty:'Iniciante',    description:'Em pé, barra com pegada supinada na largura dos ombros. Flexione os cotovelos trazendo a barra até o peito. Mantenha os cotovelos fixos ao lado do corpo.' },
+  { name:'Rosca Alternada com Halteres',muscle:'Bíceps',  series:'3', reps:'10–12', rest:'60s', difficulty:'Iniciante',    description:'Em pé com halteres. Flexione um braço de cada vez girando o punho ao subir. Controle a descida sem balançar o tronco.' },
+  { name:'Rosca Concentrada',           muscle:'Bíceps',  series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Sentado, cotovelo apoiado na face interna da coxa. Flexione o cotovelo levando o halter até o ombro. Máximo pico de contração.' },
+  { name:'Rosca Scott (Preacher Curl)', muscle:'Bíceps',  series:'3', reps:'10–12', rest:'60s', difficulty:'Intermediário', description:'Braços apoiados no banco Scott. Flexione os cotovelos completamente. O apoio elimina o uso do deltoide frontal.' },
+  { name:'Rosca Martelo',              muscle:'Bíceps',  series:'3', reps:'10–12', rest:'60s', difficulty:'Iniciante',    description:'Pegada neutra (polegar para cima). Flexione o cotovelo mantendo o punho sem rotação. Trabalha bíceps braquial e braquiorradial.' },
+  { name:'Rosca 21',                   muscle:'Bíceps',  series:'3', reps:'21',    rest:'75s', difficulty:'Intermediário', description:'7 repetições na metade inferior do movimento, 7 na metade superior e 7 completas em sequência sem descanso entre as fases.' },
+
+  // TRÍCEPS
+  { name:'Tríceps Testa com Barra',     muscle:'Tríceps', series:'4', reps:'10–12', rest:'75s', difficulty:'Intermediário', description:'Deitado no banco, barra acima do rosto. Flexione apenas os cotovelos descendo a barra à testa. Estenda de volta sem travar.' },
+  { name:'Tríceps Pulley (Polia Alta)', muscle:'Tríceps', series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'De pé na frente da polia. Cotovelos fixos ao lado do corpo. Estenda os antebraços para baixo contraindo o tríceps. Retorne controlando.' },
+  { name:'Mergulho entre Bancos (Dips)',muscle:'Tríceps', series:'4', reps:'10–15', rest:'75s', difficulty:'Intermediário', description:'Mãos em um banco atrás de você, pés no chão ou num segundo banco. Desça flexionando os cotovelos e empurre de volta.' },
+  { name:'Tríceps Coice com Halter',    muscle:'Tríceps', series:'3', reps:'12–15', rest:'60s', difficulty:'Iniciante',    description:'Tronco inclinado, braço paralelo ao chão. Estenda o antebraço para trás contraindo o tríceps. Cotovelo fica fixo.' },
+  { name:'Tríceps Francês com Halter',  muscle:'Tríceps', series:'3', reps:'10–12', rest:'75s', difficulty:'Iniciante',    description:'Sentado ou em pé, halter acima da cabeça com ambas as mãos. Flexione os cotovelos descendo atrás da cabeça. Estenda completamente.' },
+  { name:'Supino Fechado',             muscle:'Tríceps', series:'3', reps:'8–12',  rest:'90s', difficulty:'Intermediário', description:'Barra com pegada fechada (ombros). Desça controlando até o peito. Empurre focando nos tríceps mantendo os cotovelos próximos ao corpo.' },
+
+  // CORE
+  { name:'Abdominal Crunch',           muscle:'Core',    series:'4', reps:'20',    rest:'45s', difficulty:'Iniciante',    description:'Deitado, joelhos flexionados. Contraia o abdômen elevando os ombros do chão. Não puxe o pescoço com as mãos. Expire no esforço.' },
+  { name:'Prancha',                    muscle:'Core',    series:'4', reps:'30–60s',rest:'45s', difficulty:'Iniciante',    description:'Apoie nos antebraços e pontas dos pés. Corpo reto como uma prancha. Contraia abdômen e glúteo. Respire normalmente.' },
+  { name:'Abdominal na Polia Alta',    muscle:'Core',    series:'3', reps:'15–20', rest:'45s', difficulty:'Iniciante',    description:'Ajoelhado na frente da polia. Puxe a corda na nuca. Contraia o abdômen descendo o tronco até as costas ficarem arredondadas.' },
+  { name:'Elevação de Pernas Suspenso',muscle:'Core',    series:'3', reps:'12–15', rest:'60s', difficulty:'Intermediário', description:'Suspenso na barra ou em apoios. Eleve as pernas estendidas ou com joelhos flexionados até a altura do quadril. Controle a descida.' },
+  { name:'Rotação com Medicine Ball',  muscle:'Core',    series:'3', reps:'15 cada',rest:'45s',difficulty:'Iniciante',   description:'Sentado com os pés levemente elevados. Segure a medicine ball e gire o tronco de um lado ao outro tocando o chão.' },
+  { name:'Abdominal Oblíquo (Bicycle)',muscle:'Core',    series:'3', reps:'20',    rest:'45s', difficulty:'Iniciante',    description:'Deitado, mãos na nuca. Traga o cotovelo direito ao joelho esquerdo em movimento alternado como se pedalasse uma bicicleta.' },
+
+  // GLÚTEOS
+  { name:'Agachamento Sumô',           muscle:'Glúteos', series:'4', reps:'12–15', rest:'75s', difficulty:'Iniciante',    description:'Pés bem afastados, pontas voltadas para fora. Desça mantendo o joelho alinhado com o pé. Ativa mais os adutores e glúteos.' },
+  { name:'Elevação Pélvica com Barra', muscle:'Glúteos', series:'4', reps:'10–15', rest:'75s', difficulty:'Intermediário', description:'Ombros apoiados no banco, barra sobre o quadril. Eleve o quadril até o corpo ficar reto. Contraia os glúteos no topo.' },
+  { name:'Cadeira Abdutora (Glúteo)',  muscle:'Glúteos', series:'3', reps:'15–20', rest:'60s', difficulty:'Iniciante',    description:'Use a cadeira abdutora para ativar o glúteo médio. Afaste as pernas com controle. Mantenha as costas apoiadas no banco.' },
+  { name:'Coice no Cabo (Donkey Kick)',muscle:'Glúteos', series:'3', reps:'15 cada',rest:'60s',difficulty:'Iniciante',   description:'De quatro apoios ou em pé na polia. Estenda uma perna para trás e para cima contraindo o glúteo. Não torça o quadril.' },
+  { name:'Avanço Reverso com Halteres',muscle:'Glúteos', series:'3', reps:'12 cada',rest:'75s',difficulty:'Iniciante',  description:'Em pé com halteres. Dê um passo para trás descendo o joelho traseiro próximo ao chão. Empurre de volta com o pé da frente.' },
+
+  // CARDIO
+  { name:'Esteira – Caminhada Inclinada',muscle:'Cardio', series:'1', reps:'20–30min',rest:'–',  difficulty:'Iniciante',  description:'Inclinação entre 8 e 12%. Velocidade de caminhada confortável. Ótimo para queima de gordura sem impacto nas articulações.' },
+  { name:'Bicicleta Ergométrica',       muscle:'Cardio', series:'1', reps:'20–30min',rest:'–',  difficulty:'Iniciante',   description:'Mantenha uma cadência constante entre 70 e 90 RPM. Ajuste a resistência para que o esforço seja moderado.' },
+  { name:'Elíptico',                   muscle:'Cardio', series:'1', reps:'20–30min',rest:'–',  difficulty:'Iniciante',   description:'Movimento contínuo sem impacto. Mantenha postura ereta e use os braços ativamente. Aumente a resistência para maior intensidade.' },
+  { name:'HIIT na Esteira',            muscle:'Cardio', series:'8', reps:'30s esforço / 30s descanso',rest:'–',difficulty:'Avançado', description:'Alterne 30 segundos em velocidade máxima com 30 segundos de caminhada. Total de 8 ciclos. Aquecimento de 5 minutos antes.' },
+];
+
+function openImportLibrary() {
+  // Descobre quais já existem para não duplicar
+  const existing = new Set(EXERCISES.map(e => e.name.toLowerCase().trim()));
+  const toImport = EXERCISE_LIBRARY.filter(e => !existing.has(e.name.toLowerCase().trim()));
+
+  if (toImport.length === 0) {
+    showToast('Todos os exercícios da biblioteca já estão cadastrados!', 'aviso');
+    return;
+  }
+
+  // Agrupa por músculo para exibir no modal
+  const byMuscle = {};
+  toImport.forEach(e => { (byMuscle[e.muscle] = byMuscle[e.muscle] ?? []).push(e); });
+
+  // Remove modal anterior se existir
+  document.getElementById('moImportLib')?.remove();
+  const mo = document.createElement('div');
+  mo.id = 'moImportLib';
+  mo.className = 'mo op';
+  mo.innerHTML = `
+    <div class="mb" style="max-width:580px">
+      <div class="mh">
+        <span class="mt"><i class="ti ti-database-import" style="color:var(--brand)"></i> Importar biblioteca de exercícios</span>
+        <button class="bcl" onclick="document.getElementById('moImportLib').remove()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="mbd">
+        <div style="background:var(--brand-l);border-radius:var(--border-radius-md);padding:12px;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:10px">
+          <i class="ti ti-info-circle" style="color:var(--brand-d);font-size:18px;flex-shrink:0;margin-top:1px"></i>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--brand-d);margin-bottom:2px">${toImport.length} exercícios prontos para importar</div>
+            <div style="font-size:12px;color:var(--brand-d)">Exercícios já cadastrados foram ignorados automaticamente. Selecione os grupos que deseja importar.</div>
+          </div>
+        </div>
+
+        <!-- Seletor de grupos musculares -->
+        <div style="margin-bottom:1rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:600">Selecionar grupos</span>
+            <div style="display:flex;gap:8px">
+              <button class="bas" style="font-size:11px" onclick="toggleAllImport(true)">Todos</button>
+              <button class="bas" style="font-size:11px" onclick="toggleAllImport(false)">Nenhum</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px" id="importMuscleFilter">
+            ${Object.keys(byMuscle).map(m => `
+              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:5px 10px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;background:var(--brand);color:white;border-color:var(--brand)" id="imlabel-${m}">
+                <input type="checkbox" id="imcheck-${m}" checked style="accent-color:white" onchange="updateImportCount()">
+                ${m} <span style="font-weight:700">(${byMuscle[m].length})</span>
+              </label>`).join('')}
+          </div>
+        </div>
+
+        <!-- Prévia dos exercícios -->
+        <div style="max-height:260px;overflow-y:auto;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px" id="importPreview">
+          ${Object.entries(byMuscle).map(([m, exs]) => exs.map(e => `
+            <div class="imrow" data-muscle="${m}" style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)">
+              <div style="width:6px;height:6px;border-radius:50%;background:${muscleColorDark(m)};flex-shrink:0"></div>
+              <div style="flex:1;font-size:12px;color:var(--color-text-primary)">${e.name}</div>
+              <span style="font-size:10px;color:var(--color-text-secondary)">${m}</span>
+              <span style="font-size:10px;padding:1px 6px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-secondary)">${e.difficulty}</span>
+            </div>`).join('')).join('')}
+        </div>
+
+        <div style="margin-top:1rem;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:13px;color:var(--color-text-secondary)" id="importCountLabel">Importando <strong>${toImport.length}</strong> exercícios</span>
+          <div style="display:flex;gap:8px">
+            <button class="bcn" onclick="document.getElementById('moImportLib').remove()">Cancelar</button>
+            <button class="bco" id="btnDoImport" data-label="Importar exercícios" onclick="doImportLibrary()">
+              <i class="ti ti-database-import"></i> Importar exercícios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(mo);
+}
+
+function toggleAllImport(check) {
+  document.querySelectorAll('[id^="imcheck-"]').forEach(cb => {
+    cb.checked = check;
+    cb.dispatchEvent(new Event('change'));
+  });
+}
+
+function updateImportCount() {
+  const existing = new Set(EXERCISES.map(e => e.name.toLowerCase().trim()));
+  const toImport = EXERCISE_LIBRARY.filter(e => !existing.has(e.name.toLowerCase().trim()));
+  const byMuscle = {};
+  toImport.forEach(e => { (byMuscle[e.muscle] = byMuscle[e.muscle] ?? []).push(e); });
+
+  // Atualiza visual dos labels
+  Object.keys(byMuscle).forEach(m => {
+    const cb = document.getElementById('imcheck-' + m);
+    const label = document.getElementById('imlabel-' + m);
+    if (!cb || !label) return;
+    if (cb.checked) {
+      label.style.background = 'var(--brand)';
+      label.style.color = 'white';
+      label.style.borderColor = 'var(--brand)';
+    } else {
+      label.style.background = 'transparent';
+      label.style.color = 'var(--color-text-secondary)';
+      label.style.borderColor = 'var(--color-border-secondary)';
+    }
+  });
+
+  // Mostra/oculta rows na prévia
+  document.querySelectorAll('.imrow').forEach(row => {
+    const m = row.dataset.muscle;
+    const cb = document.getElementById('imcheck-' + m);
+    row.style.display = cb?.checked ? '' : 'none';
+  });
+
+  // Conta total selecionado
+  const selected = Object.keys(byMuscle).filter(m => document.getElementById('imcheck-' + m)?.checked);
+  const count = selected.reduce((acc, m) => acc + byMuscle[m].length, 0);
+  const label = document.getElementById('importCountLabel');
+  if (label) label.innerHTML = `Importando <strong>${count}</strong> exercício${count !== 1 ? 's' : ''}`;
+}
+
+async function doImportLibrary() {
+  const existing = new Set(EXERCISES.map(e => e.name.toLowerCase().trim()));
+  const toImport = EXERCISE_LIBRARY.filter(e => {
+    if (existing.has(e.name.toLowerCase().trim())) return false;
+    const cb = document.getElementById('imcheck-' + e.muscle);
+    return cb?.checked ?? true;
+  });
+
+  if (toImport.length === 0) {
+    showToast('Nenhum exercício selecionado.', 'aviso');
+    return;
+  }
+
+  setBtnLoading('btnDoImport', true);
+
+  const user = await getCurrentUser();
+  let success = 0, errors = 0;
+
+  // Importa em lotes de 10 para não sobrecarregar
+  const BATCH = 10;
+  for (let i = 0; i < toImport.length; i += BATCH) {
+    const batch = toImport.slice(i, i + BATCH).map(e => ({
+      name:         e.name,
+      muscle_group: e.muscle,
+      series:       e.series,
+      reps:         e.reps,
+      rest:         e.rest,
+      difficulty:   e.difficulty,
+      description:  e.description,
+      video_url:    '',
+      created_by:   user.id,
+    }));
+
+    try {
+      const { data, error } = await supabaseClient.from('exercises').insert(batch).select();
+      if (error) throw error;
+      data.forEach(row => EXERCISES.push(normalizeExercise(row)));
+      success += batch.length;
+    } catch (err) {
+      console.error('Batch error:', err);
+      errors += batch.length;
+    }
+  }
+
+  document.getElementById('moImportLib')?.remove();
+
+  if (success > 0 && errors === 0) {
+    showToast(`✅ ${success} exercícios importados com sucesso!`, 'sucesso');
+  } else if (success > 0) {
+    showToast(`${success} importados, ${errors} com erro.`, 'aviso');
+  } else {
+    showToast('Erro ao importar. Tente novamente.', 'erro');
+  }
+
+  activeFilter = 'Todos';
+  rExercicios();
+}
+
+function muscleIcon(muscle) {
+  const s = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  const map = {
+    // Halter completo — claro e universal
+    'Peito':   `<svg ${s}><line x1="4" y1="12" x2="20" y2="12"/><rect x="1" y="10" width="3" height="4" rx="1"/><rect x="20" y="10" width="3" height="4" rx="1"/><rect x="4" y="9" width="3" height="6" rx="1"/><rect x="17" y="9" width="3" height="6" rx="1"/></svg>`,
+    // Halter vertical (overhead press)
+    'Ombros':  `<svg ${s}><line x1="12" y1="3" x2="12" y2="21"/><rect x="10" y="1" width="4" height="3" rx="1"/><rect x="10" y="20" width="4" height="3" rx="1"/><rect x="10" y="4" width="4" height="4" rx="1"/><rect x="10" y="16" width="4" height="4" rx="1"/></svg>`,
+    // Braço flexionado mostrando bíceps
+    'Bíceps':  `<svg ${s}><path d="M7 17c0 0 0-5 2-8 1-2 3-3 5-2s3 3 2 6l-1 4"/><path d="M7 17h8"/><path d="M9 8 C9 5 13 4 14 7"/></svg>`,
+    // Braço estendido para baixo (extensão)
+    'Tríceps': `<svg ${s}><path d="M8 4 Q12 4 14 6l1 6c.5 2 0 4-2 5H9c-2-1-2.5-3-2-5l1-6Q9 4 8 4z"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="10" y1="21" x2="14" y2="21"/></svg>`,
+    // Perna dobrada (agachamento)
+    'Pernas':  `<svg ${s}><path d="M8 3h2l.5 8-3 5 1 5h2l2-4 2 4h2l1-5-3-5 .5-8h2"/></svg>`,
+    // Coração + pulso ECG
+    'Cardio':  `<svg ${s}><path d="M12 21C12 21 4 14 4 8a4 4 0 0 1 8 0 4 4 0 0 1 8 0c0 6-8 13-8 13z"/></svg>`,
+    // Abdômen com linhas horizontais (tabletes)
+    'Core':    `<svg ${s}><rect x="9" y="3" width="6" height="18" rx="3"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`,
+    // Glúteo — curva dupla
+    'Glúteos': `<svg ${s}><path d="M5 20 Q7 12 12 12 Q17 12 19 20"/><path d="M12 12 Q12 6 12 4"/><circle cx="12" cy="4" r="2"/></svg>`,
+    // Costas — pessoa de costas com trapézio
+    'Costas':  `<svg ${s}><circle cx="12" cy="4" r="2"/><path d="M7 8 Q12 7 17 8l1 6H6z"/><line x1="9" y1="14" x2="8" y2="21"/><line x1="15" y1="14" x2="16" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/></svg>`,
+  };
+  return map[muscle] ?? map['Peito'];
+}
+
+function renderExCards(filter) {
+  const list = EXERCISES.filter(e => filter === 'Todos' || e.muscle === filter);
+  if (!list.length) return `<p style="font-size:13px;color:var(--color-text-secondary)">Nenhum exercício encontrado.</p>`;
+  return list.map(e => `
+    <div class="ec" onclick="openEx('${e.id}')">
+      <div class="et" style="background:${muscleColor(e.muscle)};display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">
+        ${e.yt
+          ? `<img src="https://img.youtube.com/vi/${e.yt}/mqdefault.jpg"
+                  alt="${e.name}"
+                  style="width:100%;height:100%;object-fit:cover;display:block"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+             />
+             <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;position:absolute;inset:0">
+               <div style="width:38px;height:38px;color:${muscleColorDark(e.muscle)}">${muscleIcon(e.muscle)}</div>
+             </div>`
+          : `<div style="width:38px;height:38px;color:${muscleColorDark(e.muscle)}">${muscleIcon(e.muscle)}</div>`
+        }
+      </div>
+      <div class="ei">
+        <div class="en">${e.name}</div>
+        <div class="em">${e.series} séries · ${e.reps}</div>
+        <span class="mtag">${e.muscle}</span>${e.yt ? '<span class="ytag"><i class="ti ti-brand-youtube"></i> YT</span>' : ''}
+        ${curUser.role === 'professor' ? `<div style="margin-top:6px;display:flex;gap:4px">
+          <button class="bas" style="font-size:10px;padding:2px 7px" onclick="event.stopPropagation();editEx('${e.id}')"><i class="ti ti-edit"></i></button>
+          <button class="bda" style="font-size:10px;padding:2px 7px" onclick="event.stopPropagation();delEx('${e.id}')"><i class="ti ti-trash"></i></button>
+        </div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function filterEx(f) {
+  activeFilter = f;
+  document.querySelectorAll('.fb').forEach(b => b.classList.toggle('on', b.textContent === f));
+  document.getElementById('exGrid').innerHTML = renderExCards(f);
+}
+
+function openNewEx() {
+  editExId = null;
+  document.getElementById('newExTitle').textContent = 'Novo exercício';
+  ['neName','neYT','neDesc','neSeries','neReps','neRest'].forEach(id => document.getElementById(id).value = '');
+  openM('moNewEx');
+}
+
+function editEx(id) {
+  const ex = getExerciseById(id); if (!ex) return;
+  editExId = id;
+  document.getElementById('newExTitle').textContent = 'Editar exercício';
+  document.getElementById('neName').value   = ex.name;
+  document.getElementById('neMuscle').value = ex.muscle;
+  document.getElementById('neSeries').value = ex.series;
+  document.getElementById('neReps').value   = ex.reps;
+  document.getElementById('neRest').value   = ex.rest;
+  document.getElementById('neDiff').value   = ex.diff || 'Intermediário';
+  document.getElementById('neYT').value     = ex.yt ? `https://www.youtube.com/watch?v=${ex.yt}` : '';
+  document.getElementById('neDesc').value   = ex.desc;
+  openM('moNewEx');
+}
+
+function openEx(id) {
+  const ex = getExerciseById(id); if (!ex) return;
+  document.getElementById('mvName').textContent   = ex.name;
+  document.getElementById('mvSeries').textContent = ex.series;
+  document.getElementById('mvReps').textContent   = ex.reps;
+  document.getElementById('mvRest').textContent   = ex.rest;
+  document.getElementById('mvMuscle').textContent = ex.muscle;
+  document.getElementById('mvDesc').textContent   = ex.desc || 'Sem descrição.';
+  document.getElementById('ytArea').innerHTML = ex.yt
+    ? `<iframe src="https://www.youtube.com/embed/${ex.yt}?rel=0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`
+    : `<div class="yph"><i class="ti ti-brand-youtube"></i><span style="color:rgba(255,255,255,.6);font-size:13px">Sem vídeo cadastrado</span></div>`;
+  openM('moVideo');
+}
+
+function rPlanos() {
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Planos de Treino</p><p class="ps">Planos que você criou para seus alunos.</p>
+    <div style="margin-bottom:1rem"><button class="bco" onclick="openNewPlan()"><i class="ti ti-plus"></i> Criar plano</button></div>
+    ${PLANS.length ? PLANS.map(p => {
+      const student = STUDENTS.find(s => s.id === p.studentId);
+      return `<div class="cd">
+        <div class="ch">
+          <span class="ct">${p.name}</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            ${student ? `<span style="font-size:12px;color:var(--color-text-secondary)">${student.name}</span>` : ''}
+            <button class="bda" onclick="deletePlan('${p.id}')"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">${p.desc}</p>
+        ${p.days.map((d, i) => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:0.5px solid var(--color-border-tertiary)">
+          <span style="font-size:11px;min-width:14px;color:var(--color-text-tertiary)">${i+1}</span>
+          <span style="font-size:13px">${d.label}</span>
+          <span style="font-size:12px;color:var(--color-text-secondary);margin-left:auto">
+            ${d.exercises.map(eid => { const e = getExerciseById(eid); return e ? e.name : ''; }).filter(Boolean).join(', ')}
+          </span>
+        </div>`).join('')}
+      </div>`;
+    }).join('') : `<p style="font-size:13px;color:var(--color-text-secondary)">Nenhum plano criado ainda.</p>`}`;
+}
+
+function openNewPlan() {
+  planDayCount = 0;
+  document.getElementById('plStudentSel').innerHTML =
+    `<option value="">Selecione um aluno</option>` +
+    STUDENTS.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('plName').value = '';
+  document.getElementById('plDesc').value = '';
+  document.getElementById('planDaysContainer').innerHTML = '';
+  addPlanDay();
+  openM('moNewPlan');
+}
+
+function addPlanDay() {
+  const i = planDayCount++;
+
+  // Agrupa exercícios por músculo
+  const byMuscle = {};
+  EXERCISES.forEach(e => {
+    (byMuscle[e.muscle] = byMuscle[e.muscle] ?? []).push(e);
+  });
+
+  const exOptions = Object.entries(byMuscle).map(([muscle, exs]) => `
+    <div style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;
+                  padding:5px 8px;background:var(--color-background-secondary);
+                  border-radius:6px;cursor:pointer;user-select:none"
+           onclick="toggleMuscleGroup(this)">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${muscleColorDark(muscle)};flex-shrink:0"></div>
+          <span style="font-size:12px;font-weight:600;color:var(--color-text-primary)">${muscle}</span>
+          <span style="font-size:11px;color:var(--color-text-tertiary)">(${exs.length})</span>
+        </div>
+        <i class="ti ti-chevron-right" style="font-size:12px;color:var(--color-text-tertiary);transition:transform .2s"></i>
+      </div>
+      <div class="muscle-group-list" style="display:none;padding:4px 8px 0">
+        ${exs.map(e => `
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 4px;
+                        border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer">
+            <input type="checkbox" class="plDayEx" value="${e.id}" style="accent-color:var(--brand);width:14px;height:14px;flex-shrink:0">
+            <span>${e.name}</span>
+          </label>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const div = document.createElement('div');
+  div.className = 'plan-day-row';
+  div.style.cssText = 'border:0.5px solid var(--color-border-secondary);border-radius:8px;padding:12px;margin-bottom:10px';
+  div.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <input class="fi plDayLabel" placeholder="Nome do dia (ex: Dia A – Peito)" style="flex:1"/>
+      <button class="bda" onclick="this.closest('.plan-day-row').remove()"><i class="ti ti-trash"></i></button>
+    </div>
+    <div style="margin-bottom:8px">
+      <input class="fi" placeholder="Buscar exercício..." style="font-size:12px;padding:6px 10px"
+             oninput="filterPlanExercises(this)"/>
+    </div>
+    <div class="ex-group-container" style="max-height:240px;overflow-y:auto">${exOptions}</div>`;
+  document.getElementById('planDaysContainer').appendChild(div);
+}
+
+function toggleMuscleGroup(header) {
+  const list = header.nextElementSibling;
+  const icon = header.querySelector('.ti-chevron-right');
+  const open = list.style.display === 'block';
+  list.style.display = open ? 'none' : 'block';
+  if (icon) icon.style.transform = open ? '' : 'rotate(90deg)';
+}
+
+function filterPlanExercises(input) {
+  const term = input.value.toLowerCase().trim();
+  const container = input.closest('.plan-day-row').querySelector('.ex-group-container');
+
+  container.querySelectorAll('.muscle-group-list').forEach(list => {
+    let visibleInGroup = 0;
+    list.querySelectorAll('label').forEach(label => {
+      const name = label.querySelector('span')?.textContent.toLowerCase() ?? '';
+      const match = !term || name.includes(term);
+      label.style.display = match ? '' : 'none';
+      if (match) visibleInGroup++;
+    });
+    // Mostra/oculta o grupo inteiro e abre se tiver match
+    const groupDiv = list.closest('div');
+    groupDiv.style.display = visibleInGroup === 0 && term ? 'none' : '';
+    if (term && visibleInGroup > 0) list.style.display = 'block';
+    else if (!term) list.style.display = 'none';
+  });
+}
+
+function rAvaliacoes() {
+  const hasStudents = STUDENTS.length > 0;
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Avaliações Físicas</p>
+    <p class="ps">Registros de avaliação de todos os seus alunos.</p>
+    ${!hasStudents ? `<div style="text-align:center;padding:3rem;color:var(--color-text-secondary)">
+      <div style="font-size:36px;margin-bottom:12px"><i class="ti ti-heart-rate-monitor"></i></div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Nenhum aluno cadastrado</div>
+      <p style="font-size:13px">Cadastre alunos para registrar avaliações.</p>
+    </div>` : STUDENTS.map((s, i) => {
+      const avs = s.avaliacoes ?? [];
+      const lastAv = avs[0] ?? null;
+      const prevAv = avs[1] ?? null;
+
+      // Calcula variação entre última e penúltima avaliação
+      function delta(campo, unit='') {
+        if (!lastAv || !prevAv) return '';
+        const curr = lastAv[campo];
+        const prev = prevAv[campo];
+        if (curr == null || prev == null) return '';
+        const diff = (parseFloat(curr) - parseFloat(prev)).toFixed(1);
+        const pos = parseFloat(diff) > 0;
+        const zero = parseFloat(diff) === 0;
+        if (zero) return `<span style="font-size:10px;color:var(--color-text-tertiary)">= igual</span>`;
+        // Para gordura e cintura, queda é positiva
+        const isBad = ['body_fat','waist','hips'].includes(campo);
+        const good = isBad ? !pos : pos;
+        return `<span style="font-size:10px;font-weight:600;color:${good ? 'var(--brand-d)' : '#A32D2D'}">${pos ? '+' : ''}${diff}${unit}</span>`;
+      }
+
+      return `<div class="cd">
+        <div class="ch">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="av ${avCls(i)}" style="width:32px;height:32px;font-size:12px">${initials(s.name)}</div>
+            <div>
+              <span class="ct">${s.name}</span>
+              ${avs.length > 0 ? `<div style="font-size:11px;color:var(--color-text-secondary)">${avs.length} avaliação${avs.length > 1 ? 'ões' : ''} registrada${avs.length > 1 ? 's' : ''}</div>` : ''}
+            </div>
+          </div>
+          <button class="bco" style="font-size:12px;padding:6px 12px" onclick="openAvFor('${s.id}')"><i class="ti ti-plus"></i> Nova avaliação</button>
+        </div>
+        ${avs.length === 0
+          ? `<div style="padding:1rem;background:var(--color-background-secondary);border-radius:var(--border-radius-md);text-align:center">
+              <p style="font-size:13px;color:var(--color-text-secondary)">Nenhuma avaliação registrada para ${s.name.split(' ')[0]}.</p>
+            </div>`
+          : `
+          <!-- Resumo da última avaliação -->
+          ${lastAv ? `<div style="background:var(--brand-l);border-radius:var(--border-radius-md);padding:12px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:12px;font-weight:700;color:var(--brand-d)">Última avaliação — ${fmtDate(lastAv.date)}</span>
+              ${calcIMC(lastAv)}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              ${[
+                ['Peso','weight','kg'],['Gordura','body_fat','%'],
+                ['Músculo','muscle_mass','kg'],['Cintura','waist','cm'],
+              ].map(([l,c,u]) => `<div style="background:white;border-radius:6px;padding:8px;text-align:center">
+                <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:2px">${l}</div>
+                <div style="font-size:15px;font-weight:700;color:var(--color-text-primary)">${lastAv[c] ?? '–'}<span style="font-size:10px;font-weight:400"> ${lastAv[c] != null ? u : ''}</span></div>
+                ${delta(c, u)}
+              </div>`).join('')}
+            </div>
+          </div>` : ''}
+          <!-- Histórico completo expansível -->
+          <div id="avhist-${s.id}">
+            ${avs.map((av, idx) => `
+              <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:8px;overflow:hidden">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;background:var(--color-background-secondary)"
+                     onclick="toggleAvDetail('avd-${s.id}-${idx}',this)">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <i class="ti ti-chevron-right" style="font-size:13px;color:var(--color-text-tertiary);transition:transform .2s" id="avico-${s.id}-${idx}"></i>
+                    <span style="font-size:13px;font-weight:600">${fmtDate(av.date)}</span>
+                    ${idx === 0 ? `<span style="font-size:10px;padding:2px 6px;border-radius:20px;background:var(--brand);color:white;font-weight:600">Mais recente</span>` : ''}
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    ${calcIMC(av)}
+                    <button class="bda" style="font-size:10px;padding:2px 8px" onclick="event.stopPropagation();deleteAvaliacao('${s.id}','${av.id}')"><i class="ti ti-trash"></i></button>
+                  </div>
+                </div>
+                <div id="avd-${s.id}-${idx}" style="display:none;padding:12px">
+                  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px">
+                    ${[
+                      ['Peso', av.weight ?? av.peso, 'kg'],
+                      ['Altura', av.height ?? av.altura, (av.height ?? av.altura) > 3 ? 'cm' : 'm'],
+                      ['% Gordura', av.body_fat ?? av.gordura, '%'],
+                      ['Músculo', av.muscle_mass ?? av.musculo, 'kg'],
+                      ['Peitoral', av.chest ?? av.peito, 'cm'],
+                      ['Cintura', av.waist ?? av.cintura, 'cm'],
+                      ['Quadril', av.hips ?? av.quadril, 'cm'],
+                      ['Braço', av.arm ?? av.braco, 'cm'],
+                    ].map(([l,v,u]) => `<div class="sc"><div class="sl">${l}</div>
+                      <div style="font-size:14px;font-weight:600">${v ?? '–'}${v != null ? `<span style="font-size:10px;font-weight:400"> ${u}</span>` : ''}</div>
+                    </div>`).join('')}
+                  </div>
+                  ${av.notes || av.obs ? `<div style="background:var(--color-background-secondary);border-radius:6px;padding:8px">
+                    <p style="font-size:12px;color:var(--color-text-secondary);font-style:italic">"${av.notes || av.obs}"</p>
+                  </div>` : ''}
+                </div>
+              </div>`).join('')}
+          </div>`}
+      </div>`;
+    }).join('')}`;
+}
+
+function toggleAvDetail(id, headerEl) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const open = el.style.display === 'block';
+  el.style.display = open ? 'none' : 'block';
+  // Rotaciona ícone chevron
+  const ico = headerEl.querySelector('[id^="avico"]');
+  if (ico) ico.style.transform = open ? '' : 'rotate(90deg)';
+}
+
+async function deleteAvaliacao(studentId, avId) {
+  if (!confirm('Remover esta avaliação?')) return;
+  try {
+    const { error } = await supabaseClient.from('assessments').delete().eq('id', avId);
+    if (error) throw error;
+    const s = STUDENTS.find(st => st.id === studentId);
+    if (s) s.avaliacoes = s.avaliacoes.filter(av => av.id !== avId);
+    showToast('Avaliação removida', 'sucesso');
+    rAvaliacoes();
+  } catch (err) {
+    showToast('Erro: ' + err.message, 'erro');
+  }
+}
+
+function calcIMC(av) {
+  const peso = parseFloat(av.weight ?? av.peso);
+  const alt  = parseFloat(av.height ?? av.altura);
+  // Altura deve ser realista — aceita tanto em cm (ex: 170) quanto em m (ex: 1.70)
+  if (!peso || !alt || alt < 1) return '';
+  const altM = alt > 3 ? alt / 100 : alt; // converte cm → m se necessário
+  const imc  = peso / (altM ** 2);
+  if (imc < 5 || imc > 100) return ''; // valor impossível, ignora
+  const [cat, cls] = imc < 18.5 ? ['Abaixo do peso','av-fr'] : imc < 25 ? ['Normal','av-ex'] : imc < 30 ? ['Sobrepeso','av-re'] : ['Obesidade','av-fr'];
+  return `<span class="avcat ${cls}">IMC ${imc.toFixed(1)} · ${cat}</span>`;
+}
+
+function rHistoricoProf(selectedId = null) {
+  // Se um aluno foi selecionado, mostra o histórico dele
+  if (selectedId) {
+    const s = STUDENTS.find(st => st.id === selectedId);
+    if (!s) return;
+    const hist = [...(s.history ?? [])].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+    const treinos = hist.filter(h => h.type === 'treino');
+    const avaliacoes = hist.filter(h => h.type === 'avaliacao');
+
+    document.getElementById('MC').innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
+        <button class="bcn" style="padding:6px 10px;display:flex;align-items:center;gap:6px" onclick="rHistoricoProf()">
+          <i class="ti ti-arrow-left"></i> Voltar
+        </button>
+        <div>
+          <p class="pt" style="margin-bottom:0">Histórico de ${s.name}</p>
+          <p class="ps" style="margin-bottom:0">${hist.length} atividade${hist.length !== 1 ? 's' : ''} registrada${hist.length !== 1 ? 's' : ''}</p>
+        </div>
+      </div>
+
+      <!-- Cards de resumo do aluno -->
+      <div class="sg" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem">
+        <div class="sc"><div class="sl">Total de treinos</div><div class="sv">${treinos.length}</div></div>
+        <div class="sc"><div class="sl">Avaliações</div><div class="sv">${avaliacoes.length}</div></div>
+        <div class="sc"><div class="sl">Última atividade</div><div class="sv" style="font-size:14px">${hist[0] ? fmtDate(hist[0].date) : '–'}</div></div>
+      </div>
+
+      <!-- Histórico completo -->
+      <div class="cd">
+        ${hist.length === 0
+          ? `<p style="font-size:13px;color:var(--color-text-secondary)">Nenhuma atividade registrada para este aluno.</p>`
+          : hist.map(h => `<div class="hrow">
+              <span class="hdate">${fmtDate(h.date)}</span>
+              <div class="hinfo">
+                <div class="htitle">${h.label}</div>
+                <div class="hdet">${h.details ?? ''}</div>
+                <div>${(h.tags ?? []).map(t => `<span class="htag">${t}</span>`).join('')}</div>
+              </div>
+              <i class="ti ti-${h.type === 'avaliacao' ? 'heart-rate-monitor' : 'barbell'}"
+                 style="color:${h.type === 'avaliacao' ? 'var(--acc)' : 'var(--brand)'};font-size:16px" aria-hidden="true"></i>
+            </div>`).join('')}
+      </div>`;
+    return;
+  }
+
+  // Lista de alunos
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Histórico Geral</p>
+    <p class="ps">Selecione um aluno para ver o histórico detalhado.</p>
+    ${STUDENTS.length === 0
+      ? `<div class="cd"><p style="font-size:13px;color:var(--color-text-secondary)">Nenhum aluno cadastrado.</p></div>`
+      : STUDENTS.map((s, i) => {
+          const hist   = s.history ?? [];
+          const treinos = hist.filter(h => h.type === 'treino').length;
+          const lastH  = [...hist].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))[0];
+          const plan   = getPlanById(s.plan_id || s.plan);
+          return `
+            <div class="cd" style="cursor:pointer;transition:border-color .15s"
+                 onclick="rHistoricoProf('${s.id}')"
+                 onmouseenter="this.style.borderColor='var(--brand)'"
+                 onmouseleave="this.style.borderColor=''">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="av ${avCls(i)}" style="width:42px;height:42px;font-size:15px;flex-shrink:0">${initials(s.name)}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">${s.name}</div>
+                  <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">
+                    ${plan ? plan.name : 'Sem plano'} · ${s.goal ?? ''}
+                  </div>
+                  <div style="display:flex;gap:12px;margin-top:6px">
+                    <span style="font-size:11px;color:var(--color-text-secondary)">
+                      <i class="ti ti-barbell" style="color:var(--brand)"></i> ${treinos} treino${treinos !== 1 ? 's' : ''}
+                    </span>
+                    <span style="font-size:11px;color:var(--color-text-secondary)">
+                      <i class="ti ti-calendar" style="color:var(--acc)"></i>
+                      ${lastH ? 'Última ativ. ' + fmtDate(lastH.date) : 'Sem atividades'}
+                    </span>
+                  </div>
+                  ${treinos > 0 ? `<div class="pb" style="margin-top:8px"><div class="pf" style="width:${s.progress ?? 0}%"></div></div>` : ''}
+                </div>
+                <i class="ti ti-chevron-right" style="color:var(--color-text-tertiary);font-size:18px;flex-shrink:0"></i>
+              </div>
+            </div>`;
+        }).join('')}`;
+}
+
+// ============================================================
+// ASSIGN PLAN
+// ============================================================
+function openAssign(sid) {
+  assignTarget = sid;
+  const s = STUDENTS.find(st => st.id === sid);
+  document.getElementById('asTitle').textContent = `Treino para ${s.name}`;
+  selPlan = s.plan_id || s.plan;
+  const myPlans = getPlansForStudent(sid).length ? getPlansForStudent(sid) : PLANS;
+  document.getElementById('plOpts').innerHTML = myPlans.map(p => `
+    <div class="pd ${selPlan === p.id ? 'sel' : ''}" onclick="selPlanOpt('${p.id}',this)">
+      <div class="pdn">${p.name}</div><div class="pdd">${p.desc}</div>
+    </div>`).join('') || `<p style="font-size:13px;color:var(--color-text-secondary)">Nenhum plano criado. Crie um plano primeiro.</p>`;
+  openM('moAssign');
+}
+
+function selPlanOpt(id, el) {
+  selPlan = id;
+  document.querySelectorAll('.pd').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ============================================================
+// ASSESSMENT MODAL
+// ============================================================
+function openAvFor(sid) {
+  avTarget = sid;
+  const s = STUDENTS.find(st => st.id === sid);
+  document.getElementById('avTitle').textContent = `Nova avaliação – ${s.name}`;
+  ['avPeso','avAltura','avGordura','avMusculo','avPeito','avCintura','avQuadril','avBraco','avObs']
+    .forEach(id => document.getElementById(id).value = '');
+  openM('moAvaliacao');
+}
+
+// ============================================================
+// PÁGINAS — ALUNO
+// ============================================================
+function rMeuTreino() {
+  // Restaura estado salvo no localStorage (se vier de um refresh)
+  loadWorkoutState();
+  const mc = document.getElementById('MC');
+  const student = STUDENTS.find(s => s.id === curUser.sid);
+  const planId = student?.plan_id || student?.plan;
+  const plan = planId ? getPlanById(planId) : (PLANS.length ? PLANS[0] : null);
+
+  if (!plan) {
+    mc.innerHTML = `<p class="pt">Meu Treino</p>
+      <div style="text-align:center;padding:3rem 1rem;color:var(--color-text-secondary)">
+        <div style="font-size:36px;margin-bottom:12px"><i class="ti ti-clipboard-x" aria-hidden="true"></i></div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:6px">Nenhum treino atribuído</div>
+        <p style="font-size:13px">Aguarde seu professor configurar seu plano.</p>
+      </div>`; return;
+  }
+
+  mc.innerHTML = `<p class="pt">Meu Treino</p><p class="ps">${plan.name} · ${plan.desc}</p>
+    <div class="sg" style="margin-bottom:1.5rem">
+      <div class="sc"><div class="sl">Progresso geral</div><div class="sv">${student?.progress ?? 0}%</div></div>
+      <div class="sc"><div class="sl">Dias de treino</div><div class="sv">${plan.days.length}</div></div>
+      <div class="sc"><div class="sl">Feitos hoje</div><div class="sv" id="doneToday">${Object.values(completedEx).filter(Boolean).length}</div></div>
+    </div>
+    ${plan.days.map((d, di) => `
+      <div class="pday">
+        <div class="pdh" onclick="toggleDay(${di})">
+          <div class="pdt"><i class="ti ti-calendar-event" style="color:var(--color-text-secondary)" aria-hidden="true"></i>${d.label}</div>
+          <span class="dba">${d.exercises.length} exercícios</span>
+        </div>
+        <div class="pdb ${openDays[di] ? 'op' : ''}" id="day-${di}">
+          <div id="timerBar-${di}" style="display:none;align-items:center;justify-content:space-between;padding:10px 0 6px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:4px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--brand);animation:pulse 1.2s infinite"></div>
+              <span style="font-size:13px;font-weight:600;color:var(--brand)">Treino em andamento</span>
+              <span id="timerDisplay-${di}" style="font-size:13px;font-weight:700;color:var(--color-text-primary);min-width:52px">00:00</span>
+            </div>
+<button class="bco" style="font-size:12px;padding:6px 14px" onclick="finishWorkout(${di},'${d.label.replace(/'/g,"\\'")}',${JSON.stringify(d.exercises).replace(/"/g,'&quot;')})">              <i class="ti ti-trophy"></i> Concluir treino
+            </button>
+          </div>
+          <div id="startBar-${di}" style="padding:10px 0 8px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:4px">
+            <button class="bco" style="font-size:12px;padding:6px 14px;background:var(--color-background-secondary);color:var(--brand);border:1.5px solid var(--brand)" onclick="startWorkout(${di},'${d.label.replace(/'/g,"\\'")}')">
+              <i class="ti ti-player-play"></i> Iniciar treino
+            </button>
+          </div>
+          ${d.exercises.map(eid => {
+            const ex = getExerciseById(eid); if (!ex) return '';
+            const key = `${di}-${eid}`; const done = completedEx[key];
+            return `<div class="per">
+              <div class="dc ${done ? 'dn' : ''}" id="dc-${key}" onclick="toggleDone('${key}',this,'${curUser.sid}',${di},'${d.label.replace(/'/g,"\\'")}','${ex.name.replace(/'/g,"\\'")}')">
+                ${done ? '✓' : ''}
+              </div>
+              <div class="pxi" style="background:${muscleColor(ex.muscle)};border-radius:var(--border-radius-md)"><span style="font-size:12px;font-weight:700;color:${muscleColorDark(ex.muscle)}">${(ex.muscle||'?')[0]}</span></div>
+              <div class="pxif">
+                <div class="pxn">${ex.name}</div>
+                <div class="pxs">${ex.series} séries · ${ex.reps} · descanso ${ex.rest}</div>
+              </div>
+              <button class="bw" onclick="openEx('${ex.id}')"><i class="ti ti-player-play"></i> ${ex.yt ? 'Ver vídeo' : 'Ver'}</button>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`).join('')}`;
+
+  // Restaura o estado visual se havia treino em andamento
+  if (trainDayIndex !== null) {
+    const sb = document.getElementById(`startBar-${trainDayIndex}`);
+    const tb = document.getElementById(`timerBar-${trainDayIndex}`);
+    if (sb) sb.style.display = 'none';
+    if (tb) tb.style.display = 'flex';
+    openDays[trainDayIndex] = true;
+    document.getElementById('day-' + trainDayIndex)?.classList.add('op');
+    // Restaura checkboxes marcados
+    Object.entries(completedEx).forEach(([key, done]) => {
+      if (!done) return;
+      const el = document.getElementById('dc-' + key);
+      if (el) { el.classList.add('dn'); el.innerHTML = '✓'; }
+    });
+    resumeTimerIfActive();
+  }
+}
+function toggleDay(di) {
+  openDays[di] = !openDays[di];
+  document.getElementById('day-' + di)?.classList.toggle('op', openDays[di]);
+}
+
+async function toggleDone(key, el, sid, di, dayLabel, exName) {
+  // Só permite marcar se o treino foi iniciado
+  if (trainDayIndex !== di) {
+    showToast('Inicie o treino primeiro!', 'aviso');
+    return;
+  }
+  completedEx[key] = !completedEx[key];
+  el.classList.toggle('dn', completedEx[key]);
+  el.innerHTML = completedEx[key] ? '✓' : '';
+  const dt = document.getElementById('doneToday');
+  if (dt) dt.textContent = Object.values(completedEx).filter(Boolean).length;
+  // Persiste marcações no localStorage
+  saveWorkoutState();
+}
+
+// ============================================================
+// PERSISTÊNCIA DO TREINO (sobrevive a refresh)
+// ============================================================
+function saveWorkoutState() {
+  const state = {
+    trainDayIndex,
+    trainStartTime,
+    completedEx,
+  };
+  try { localStorage.setItem('fittrack_workout', JSON.stringify(state)); } catch(_) {}
+}
+
+function loadWorkoutState() {
+  try {
+    const raw = localStorage.getItem('fittrack_workout');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    // Só restaura se foi hoje
+    if (!state.trainStartTime) return;
+    const savedDate = new Date(state.trainStartTime).toDateString();
+    if (savedDate !== new Date().toDateString()) {
+      localStorage.removeItem('fittrack_workout');
+      return;
+    }
+    trainDayIndex  = state.trainDayIndex;
+    trainStartTime = state.trainStartTime;
+    completedEx    = state.completedEx ?? {};
+  } catch(_) {}
+}
+
+function resumeTimerIfActive() {
+  if (trainDayIndex === null || !trainStartTime) return;
+  if (trainTimer) clearInterval(trainTimer);
+  trainTimer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - trainStartTime) / 1000);
+    const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const ss = String(elapsed % 60).padStart(2, '0');
+    const display = document.getElementById(`timerDisplay-${trainDayIndex}`);
+    if (display) display.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+
+function startWorkout(di, dayLabel) {
+  // Para timer anterior se existir
+  if (trainTimer) clearInterval(trainTimer);
+  trainDayIndex  = di;
+  trainStartTime = Date.now();
+
+  // Persiste no localStorage
+  saveWorkoutState();
+
+  // Esconde botão iniciar, mostra barra de timer
+  document.getElementById(`startBar-${di}`).style.display = 'none';
+  const timerBar = document.getElementById(`timerBar-${di}`);
+  timerBar.style.display = 'flex';
+
+  // Garante que o dia está aberto
+  openDays[di] = true;
+  document.getElementById('day-' + di)?.classList.add('op');
+
+  // Inicia cronômetro
+  trainTimer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - trainStartTime) / 1000);
+    const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const ss = String(elapsed % 60).padStart(2, '0');
+    const display = document.getElementById(`timerDisplay-${di}`);
+    if (display) display.textContent = `${mm}:${ss}`;
+  }, 1000);
+
+  showToast(`Treino iniciado! Bora, ${curUser.name.split(' ')[0]}! 💪`, 'sucesso');
+}
+
+let finishingWorkout = false;
+
+async function finishWorkout(di, dayLabel, exIds) {
+  if (finishingWorkout) return; // evita duplo clique
+  finishingWorkout = true;
+
+  // Desativa o botão que disparou o evento
+  document.querySelectorAll('[onclick*="finishWorkout"]').forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = '.5';
+  });
+  clearInterval(trainTimer);
+  trainTimer = null;
+
+  const elapsed = Math.floor((Date.now() - trainStartTime) / 1000);
+  const mm      = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const ss      = String(elapsed % 60).padStart(2, '0');
+  const timeStr = `${mm}:${ss}`;
+
+  const total = exIds.length;
+  const done  = exIds.filter(eid => completedEx[`${di}-${eid}`]).length;
+  const pct   = Math.round((done / total) * 100);
+
+  const msgs = [
+    { min: 100, msg: '🏆 Perfeito! Você completou 100% do treino. Incrível!' },
+    { min: 75,  msg: '💪 Ótimo trabalho! Mais de 75% concluído. Continue assim!' },
+    { min: 50,  msg: '👍 Bom esforço! Mais da metade feita. Cada treino conta!' },
+    { min: 0,   msg: '🌱 Começar já é vencer! Amanhã você vai além.' },
+  ];
+  const motivacional = msgs.find(m => pct >= m.min).msg;
+
+  const sid = curUser.sid;
+
+  // Salva no histórico
+  await registerHistory(sid, {
+    date:    new Date().toISOString().slice(0, 10),
+    type:    'treino',
+    label:   dayLabel,
+    details: `${done}/${total} exercícios · ${timeStr}`,
+    tags:    ['treino'],
+  });
+
+  // Atualiza progresso do aluno no banco
+  const student = STUDENTS.find(s => s.id === sid);
+  if (student) {
+    const newProgress = Math.min(100, (student.progress ?? 0) + Math.round(pct / 10));
+    try {
+      await dbUpdateStudentProgress(sid, newProgress);
+      student.progress = newProgress;
+    } catch (e) {
+      console.warn('Erro ao salvar progresso:', e.message);
+    }
+  }
+
+  // Limpa estado do treino e localStorage
+  trainDayIndex    = null;
+  trainStartTime   = null;
+  completedEx      = {};
+  finishingWorkout = false;
+  saveWorkoutState();
+
+  // Mostra modal de resumo
+  showFinishModal(dayLabel, timeStr, done, total, pct, motivacional);
+}
+
+function showFinishModal(dayLabel, timeStr, done, total, pct, msg) {
+  // Remove modal anterior se existir
+  document.getElementById('moFinish')?.remove();
+
+  const mo = document.createElement('div');
+  mo.id        = 'moFinish';
+  mo.className = 'mo op';
+  mo.innerHTML = `
+    <div class="mb" style="max-width:420px;text-align:center">
+      <div style="padding:2rem 1.5rem">
+        <div style="font-size:52px;margin-bottom:12px">🏋️</div>
+        <div style="font-size:20px;font-weight:700;color:var(--color-text-primary);margin-bottom:6px">Treino concluído!</div>
+        <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:1.5rem">${dayLabel}</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1.5rem">
+          <div class="sc"><div class="sl">Tempo</div><div style="font-size:22px;font-weight:700">${timeStr}</div></div>
+          <div class="sc"><div class="sl">Exercícios</div><div style="font-size:22px;font-weight:700">${done}/${total}</div></div>
+          <div class="sc"><div class="sl">Aproveitamento</div><div style="font-size:22px;font-weight:700">${pct}%</div></div>
+        </div>
+
+        <div style="background:var(--brand-l);border-radius:var(--border-radius-md);padding:14px;margin-bottom:1.5rem">
+          <p style="font-size:14px;color:var(--brand-d);font-weight:500">${msg}</p>
+        </div>
+
+        <div style="width:100%;background:var(--color-background-secondary);border-radius:99px;height:8px;margin-bottom:1.5rem">
+          <div style="width:${pct}%;background:var(--brand);height:8px;border-radius:99px;transition:width .6s"></div>
+        </div>
+
+        <button class="bco" style="width:100%" onclick="document.getElementById('moFinish').remove();nav('meu-treino')">
+          <i class="ti ti-check"></i> Fechar
+        </button>
+      </div>
+    </div>`;
+  mo.onclick = e => { if (e.target === mo) { mo.remove(); nav('meu-treino'); } };
+  document.body.appendChild(mo);
+}
+
+function rMinhaAvaliacao() {
+  const student = STUDENTS.find(s => s.id === curUser.sid);
+  const avs = student?.avaliacoes ?? [];
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Minhas Avaliações</p><p class="ps">Histórico de avaliações feitas pelo seu professor.</p>
+    ${avs.length === 0
+      ? `<div style="text-align:center;padding:3rem;color:var(--color-text-secondary)">
+          <div style="font-size:36px;margin-bottom:12px"><i class="ti ti-heart-rate-monitor"></i></div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px">Nenhuma avaliação ainda</div>
+          <p style="font-size:13px">Solicite uma avaliação ao seu professor.</p>
+        </div>`
+      : avs.map(av => `<div class="cd">
+          <div class="ch"><span class="ct">Avaliação – ${fmtDate(av.date)}</span>${calcIMC(av)}</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+            ${[
+              ['Peso', av.weight ?? av.peso, 'kg'],
+              ['Altura', av.height ?? av.altura, (av.height ?? av.altura) > 3 ? 'cm' : 'm'],
+              ['Gordura', av.body_fat ?? av.gordura, '%'],
+              ['Músculo', av.muscle_mass ?? av.musculo, 'kg'],
+              ['Peitoral', av.chest ?? av.peito, 'cm'],
+              ['Cintura', av.waist ?? av.cintura, 'cm'],
+              ['Quadril', av.hips ?? av.quadril, 'cm'],
+              ['Braço', av.arm ?? av.braco, 'cm'],
+            ].map(([l, v, u]) => `<div class="sc"><div class="sl">${l}</div>
+              <div style="font-size:18px;font-weight:600">${v || '–'}<span style="font-size:12px;font-weight:400"> ${u}</span></div>
+            </div>`).join('')}
+          </div>
+          ${av.notes || av.obs ? `<div style="border-top:0.5px solid var(--color-border-tertiary);padding-top:1rem;margin-top:1rem">
+            <p style="font-size:13px;color:var(--color-text-secondary);font-style:italic">"${av.notes || av.obs}"</p></div>` : ''}
+        </div>`).join('')}`;
+}
+
+function rMeuHistorico() {
+  const student = STUDENTS.find(s => s.id === curUser.sid);
+  const hist = [...(student?.history ?? [])].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Meu Histórico</p><p class="ps">Registro de todas as suas atividades.</p>
+    <div class="cd">
+      ${hist.length === 0
+        ? `<p style="font-size:13px;color:var(--color-text-secondary)">Complete exercícios no seu treino para registrar aqui!</p>`
+        : hist.map(h => `<div class="hrow">
+            <span class="hdate">${fmtDate(h.date)}</span>
+            <div class="hinfo">
+              <div class="htitle">${h.label}</div>
+              <div class="hdet">${h.details}</div>
+              <div>${(h.tags ?? []).map(t => `<span class="htag">${t}</span>`).join('')}</div>
+            </div>
+            <i class="ti ti-${h.type === 'avaliacao' ? 'heart-rate-monitor' : 'barbell'}" style="color:var(--color-text-tertiary);font-size:16px" aria-hidden="true"></i>
+          </div>`).join('')}
+    </div>`;
+}
+
+function rProgresso() {
+  const student = STUDENTS.find(s => s.id === curUser.sid);
+  const doneToday = Object.values(completedEx).filter(Boolean).length;
+  const avs = student?.avaliacoes ?? [];
+  const lastAv = avs[0] ?? null;
+  const prevAv = avs[1] ?? null;
+  const history = [...(student?.history ?? [])].sort((a,b) => (b.date??'').localeCompare(a.date??''));
+
+  // Calcula treinos por músculo com base no histórico real
+  const muscleCount = {};
+  const muscleTotals = {};
+  const plan = PLANS.find(p => p.id === (student?.plan_id || student?.plan));
+  if (plan) {
+    plan.days.forEach(d => {
+      d.exercises.forEach(eid => {
+        const ex = getExerciseById(eid);
+        if (ex?.muscle) muscleTotals[ex.muscle] = (muscleTotals[ex.muscle] ?? 0) + 1;
+      });
+    });
+  }
+  // Conta exercícios completados do histórico (labels dos treinos concluídos)
+  const completedDays = history.filter(h => h.type === 'treino');
+  if (plan) {
+    completedDays.forEach(h => {
+      const day = plan.days.find(d => d.label === h.label);
+      if (day) {
+        day.exercises.forEach(eid => {
+          const ex = getExerciseById(eid);
+          if (ex?.muscle) muscleCount[ex.muscle] = (muscleCount[ex.muscle] ?? 0) + 1;
+        });
+      }
+    });
+  }
+
+  // Percentual por músculo (cap 100)
+  const muscles = Object.keys(muscleTotals).length > 0 ? Object.keys(muscleTotals) :
+    ['Peito','Costas','Pernas','Ombros','Bíceps','Core'];
+  const muscleProgress = muscles.map(m => {
+    const total = muscleTotals[m] ?? 1;
+    const done = muscleCount[m] ?? 0;
+    const pct = Math.min(100, Math.round((done / total) * 100 * completedDays.length / Math.max(1, completedDays.length)));
+    return [m, Math.min(100, done > 0 ? Math.max(10, pct) : 0)];
+  });
+
+  // Streak: dias consecutivos com treino
+  function calcStreak(hist) {
+    const days = [...new Set(hist.filter(h => h.type==='treino').map(h => h.date))].sort().reverse();
+    if (!days.length) return 0;
+    let streak = 0, prev = null;
+    for (const d of days) {
+      if (!prev) { streak = 1; prev = d; continue; }
+      const diff = (new Date(prev) - new Date(d)) / 86400000;
+      if (diff <= 1) { streak++; prev = d; } else break;
+    }
+    return streak;
+  }
+  const streak = calcStreak(history);
+
+  // Variação de peso entre avaliações
+  function weightDelta() {
+    if (!lastAv || !prevAv) return '';
+    const curr = parseFloat(lastAv.weight ?? lastAv.peso);
+    const prev = parseFloat(prevAv.weight ?? prevAv.peso);
+    if (isNaN(curr) || isNaN(prev)) return '';
+    const diff = (curr - prev).toFixed(1);
+    const pos = parseFloat(diff) > 0;
+    return `<span style="font-size:12px;font-weight:600;color:${pos ? '#A32D2D' : 'var(--brand-d)'}">${pos ? '+' : ''}${diff} kg desde última avaliação</span>`;
+  }
+
+  document.getElementById('MC').innerHTML = `
+    <p class="pt">Meu Progresso</p>
+    <p class="ps">Evolução real calculada com base nos seus treinos e avaliações.</p>
+
+    <!-- Cards de resumo -->
+    <div class="sg" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem">
+      <div class="sc"><div class="sl">Progresso geral</div><div class="sv">${student?.progress ?? 0}%</div></div>
+      <div class="sc"><div class="sl">Treinos feitos</div><div class="sv">${completedDays.length}</div></div>
+      <div class="sc"><div class="sl">Sequência atual</div><div class="sv">${streak} dia${streak !== 1 ? 's' : ''}</div></div>
+      <div class="sc"><div class="sl">Avaliações</div><div class="sv">${avs.length}</div></div>
+    </div>
+
+    <!-- Barra de progresso geral -->
+    <div class="cd" style="margin-bottom:1rem">
+      <div class="ct" style="margin-bottom:10px">Progresso geral do plano</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div class="pb" style="height:10px;border-radius:6px">
+            <div class="pf" style="width:${student?.progress ?? 0}%;height:10px;border-radius:6px;transition:width 1s"></div>
+          </div>
+        </div>
+        <span style="font-size:16px;font-weight:700;color:var(--brand-d);min-width:42px">${student?.progress ?? 0}%</span>
+      </div>
+      ${completedDays.length === 0
+        ? `<p style="font-size:12px;color:var(--color-text-secondary);margin-top:8px">Complete treinos para ver seu progresso evoluir.</p>`
+        : `<p style="font-size:12px;color:var(--color-text-secondary);margin-top:8px">
+            Baseado em ${completedDays.length} treino${completedDays.length > 1 ? 's' : ''} concluído${completedDays.length > 1 ? 's' : ''}.
+          </p>`}
+    </div>
+
+    <!-- Progresso por grupo muscular (baseado no plano + histórico) -->
+    <div class="cd" style="margin-bottom:1rem">
+      <div class="ct" style="margin-bottom:1rem">Frequência por grupo muscular</div>
+      ${muscleProgress.length === 0 ? `<p style="font-size:13px;color:var(--color-text-secondary)">Sem plano atribuído ainda.</p>` :
+        muscleProgress.map(([m, p]) => `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div style="width:8px;height:8px;border-radius:50%;background:${muscleColor(m) === '#EBEBEA' ? '#aaa' : muscleColorDark(m)}"></div>
+                <span>${m}</span>
+              </div>
+              <span style="color:var(--color-text-secondary);font-size:12px">${muscleCount[m] ?? 0} exercício${(muscleCount[m]??0) !== 1 ? 's' : ''} concluído${(muscleCount[m]??0) !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="pb"><div class="pf" style="width:${p}%"></div></div>
+          </div>`).join('')}
+      <p style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">Calculado com base no plano ativo e treinos concluídos.</p>
+    </div>
+
+    <!-- Avaliação física mais recente -->
+    ${lastAv ? `<div class="cd" style="margin-bottom:1rem">
+      <div class="ch" style="margin-bottom:12px">
+        <span class="ct">Última avaliação — ${fmtDate(lastAv.date)}</span>
+        ${calcIMC(lastAv)}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:${prevAv ? '12px' : '0'}">
+        ${[
+          ['Peso', lastAv.weight ?? lastAv.peso, 'kg'],
+          ['Gordura', lastAv.body_fat ?? lastAv.gordura, '%'],
+          ['Músculo', lastAv.muscle_mass ?? lastAv.musculo, 'kg'],
+          ['Cintura', lastAv.waist ?? lastAv.cintura, 'cm'],
+        ].map(([l,v,u]) => `<div class="sc"><div class="sl">${l}</div>
+          <div style="font-size:18px;font-weight:600">${v??'–'}${v!=null?`<span style="font-size:11px;font-weight:400"> ${u}</span>`:''}</div>
+        </div>`).join('')}
+      </div>
+      ${prevAv ? `<div style="border-top:0.5px solid var(--color-border-tertiary);padding-top:10px">${weightDelta()}</div>` : ''}
+    </div>` : `<div class="cd">
+      <div style="text-align:center;padding:1.5rem;color:var(--color-text-secondary)">
+        <i class="ti ti-heart-rate-monitor" style="font-size:28px;margin-bottom:8px;display:block"></i>
+        <p style="font-size:13px">Nenhuma avaliação física registrada ainda. Solicite ao seu professor.</p>
+      </div>
+    </div>`}
+
+    <!-- Últimas atividades -->
+    ${history.length > 0 ? `<div class="cd">
+      <div class="ct" style="margin-bottom:1rem">Últimas atividades</div>
+      ${history.slice(0, 8).map(h => `<div class="hrow">
+        <span class="hdate">${fmtDate(h.date)}</span>
+        <div class="hinfo">
+          <div class="htitle">${h.label}</div>
+          <div class="hdet">${h.details}</div>
+        </div>
+        <i class="ti ti-${h.type === 'avaliacao' ? 'heart-rate-monitor' : 'barbell'}" style="color:var(--color-text-tertiary);font-size:16px"></i>
+      </div>`).join('')}
+    </div>` : ''}`;
+}
+
+// ============================================================
+// Init
+// ============================================================
+document.addEventListener('DOMContentLoaded', initAuth);
+</script>
+</body>
+</html>
