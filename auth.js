@@ -9,16 +9,18 @@ let CURRENT_PROFILE = null;   // linha da tabela profiles
 // Inicialização — chame no DOMContentLoaded
 // ============================================================
 async function initAuth() {
-  const user = await getCurrentUser();
+  // Usa getSession() — lê do localStorage sem chamada de rede,
+  // evita deslogar ao dar F5 enquanto o token ainda é válido
+  const { data: { session } } = await supabaseClient.auth.getSession();
 
-  if (!user) {
+  if (!session?.user) {
     showLoginScreen();
     return;
   }
 
   try {
-    CURRENT_USER    = user;
-    CURRENT_PROFILE = await getProfile(user.id);
+    CURRENT_USER    = session.user;
+    CURRENT_PROFILE = await getProfile(session.user.id);
     await bootApp();
   } catch (e) {
     console.error('initAuth error:', e);
